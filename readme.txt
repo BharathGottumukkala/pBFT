@@ -1,10 +1,10 @@
 # How to run
-### Firstly run NameScheduler.py
+## Firstly run NameScheduler.py
 ```python
 python3.6 NameScheduler.py
 ```
 NameScheduler runs on port 8765
-### Run the flask server
+## Run the flask server
 ```python
 python3.6 index.py
 ```
