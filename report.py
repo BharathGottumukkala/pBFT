@@ -1,3 +1,11 @@
+"""
+Flask ka websockets is handled by socketio.
+
+So in order to report we have to send a msg using socketio Client
+
+"""
+
+
 import socketio
 import time
 
@@ -11,7 +19,7 @@ def Report(server, handle, message):
 		sio.disconnect()
 	except Exception as e:
 		print('Trying to update client again')
-		time.sleep(0.2)
+		time.sleep(0.5)
 		Report(server, handle, message)
 	
 

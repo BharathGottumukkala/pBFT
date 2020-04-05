@@ -50,24 +50,3 @@ def log(clog, message):
 					log['commit'].append(commit)
 
 		return clog
-
-
-
-		
-
-	# clog = {}
-	# clog['type'] = message['type']
-	# clog['token'] = message['token']
-	# jwt = messaging.jwt()
-
-	# mbody = jwt.get_payload(message['token'])
-
-	# result = {'type': message['type'], 'token': mbody}
-
-	# m = None
-	# if 'm' in message:
-	# 	m = jwt.get_payload(message['m'])
-	# 	result['m'] = m
-
-
-	# return result

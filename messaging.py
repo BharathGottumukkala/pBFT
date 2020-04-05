@@ -1,3 +1,15 @@
+"""
+Class to generate signed tokens. These are called JWT tokens (Json Web Tokens).
+They have a header, payload and a signature. 
+Currently for our case the header doesnot contain anything.
+Everything is in the payload
+
+Please dont change this. kaafi complicated hai
+"""
+
+
+
+
 import json as js
 import base64
 from Cijfer import hmac, rsa

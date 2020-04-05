@@ -2,14 +2,9 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 
 def GenerateKeys(keysize):
-	# print('a')
 	random_generator = Random.new().read
-	# print('b')
 	key = RSA.generate(keysize, random_generator)
-	# print('c')
-
 	private, public = key, key.publickey()
-	# print('c')
 
 	return public, private
 

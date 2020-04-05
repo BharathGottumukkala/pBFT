@@ -5,6 +5,8 @@
 
 # (echo python3.6 Node.py; echo python3.6 Node.py) | parallel
 
+# NEVER MIND THIS FILE
+
 control_c() {
     kill $(ps aux | grep Node.py | awk '{print $2}')
     exit

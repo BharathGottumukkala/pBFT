@@ -1,3 +1,13 @@
+"""
+Class contains the methods used in messaging
+
+messaging imports class rsa to sign using those keys
+
+"""
+
+
+
+
 import hashlib
 import hmac as hm
 import base64

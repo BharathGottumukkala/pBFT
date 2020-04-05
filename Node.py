@@ -10,12 +10,20 @@ import re
 import os
 
 # Custom imports
-import communication
-# import sign
-# import rsaKeys	
-import messaging
+
+# commuication handles Sending messages to different nodes
+import communication	
+
+# messaging defines the sent token structure and handles creation and verifiction of messages
+# import messaging
+
+# Functions to handle incoming requests
 import handle_requests
+
+# Logging 
 import mlog
+
+# Report back to client for demo purposes
 import report
 
 
@@ -28,6 +36,7 @@ class Node(object):
 		# self.NameSchedulerURI = "ws://" + self.NodeIPAddr + ':' + '8765'
 		self.NameSchedulerURI = "ws://localhost:8765"
 		self.port = port
+		# Decides whether the node is primary
 		self.IsPrimary = IsPrimary
 		self.Uri = "ws://" + self.NodeIPAddr + ':' + str(self.port)
 		self.ListOfNodes = {}
@@ -36,14 +45,23 @@ class Node(object):
 		self.view = 0
 		self.count = 0
 		self.log = []
+		"""
+		self.ListOfNodes = {'NodeID': {uska details}}
+		
+		self.log = ["d": digest_m, 'm': Client_msg, 'preprepare': preprepare_msg,
+					"prepare":[List of received prepare msgs],
+					"commit": [List od commit messages]]
+		"""
 
 
 	def register(self, message):
+		# Add newnodes into ListOFNodes
 		del message['type']
 		self.ListOfNodes[message['id']] = message['info']
 
 
 	async def HandshakeRoutine(self, uri):
+		# Get an ID from the NameScheduler for future communication
 		async with websockets.connect(uri) as websocket:
 			if self.NodeId is not None:
 				print(f"My Id is {self.NodeId}")
@@ -65,26 +83,33 @@ class Node(object):
 
 
 	async def RunRoutine(self, websocket, path):
+		# Defines the funcioning of each node on receiving differnet messages
 		async for message in websocket:
+			# message format
+			# message = {'type': type, 'token': token}
+			# token is generated using messaging library in handle_requests
 			message = json.loads(message)
 			if message['type'].upper() == 'NEWNODE':
+				# When a new node is added, Register the nde's details for future communication
 				print(f"Id {message['id']} joined the network -> {self.NodeId}")
 				self.register(message)
 
 			elif message['type'].upper() == 'REQUEST':
-				# print("Client sent a request!!")
-				# print(f"Am I primary: {self.IsPrimary}")
+				# I am yet to implement client broadcasting the reqiest to all secondary nodes
 				if self.IsPrimary:
 					print(f"I am the primary with ID = {self.NodeId}")
 				else:
 					print(f"Well I am not the primary with ID = {self.NodeId}")
+				# Verify request and returns the next message to send
 				final = handle_requests.Request(message, self.client_public_key, self.view, 100, self.private_key)
 				
 				if final is not None:
 					print(len(self.ListOfNodes))
+					# Multicast the request all nodes in the network
 					communication.Multicast('224.1.1.1', 8766, final)
-					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, final)
 
+
+					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, final)
 					# BroadCast doesnot send this msg to Primary. Therefore a msg has to be sent manually
 					# await communication.SendMsgRoutine(self.Uri, final)
 					# Logging message from client and PrePrepare msg
@@ -96,6 +121,8 @@ class Node(object):
 					print(f"{self.NodeId} -> The message verification failed")
 
 			elif message['type'].upper() == 'CLIENT':
+				# Here the message i of different format..fck. Will update this in the next release :p
+				# message = {'type': type, 'client_id': '...', 'public_key':'...', 'Uri': '...'}
 				self.client_id = message['client_id']
 				self.client_public_key = message['public_key'].encode('utf-8')
 				self.client_uri = message['Uri']
@@ -106,33 +133,32 @@ class Node(object):
 				# print(message)
 				public_key_primary = None
 
+				# Get primary's public key to verify the signature
 				for client in self.ListOfNodes.values():
 					if client['primary']:
 						public_key_primary = client['public_key']
 
+				# Send all the details. It will verify and return the next packet to send
 				result = handle_requests.Preprepare(message, self.client_public_key, public_key_primary, self.NodeId, self.private_key, self.view)
 				if result is not None:
 					self.mode = 'Prepare'
 					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, result)
-					print(f"{self.NodeId} -> PrePrepare logging...")
-					# self.log.append(mlog.log(message))
+					# print(f"{self.NodeId} -> PrePrepare logging...")
 					self.log = mlog.log(self.log, message)
 					print(f"{self.NodeId} -> PrePrepare logged")
 
-					print(f"{self.NodeId} -> self Prepare logging...")
-					# self.log.append(mlog.log(result))
+					# print(f"{self.NodeId} -> self Prepare logging...")
 					self.log = mlog.log(self.log, result)
 					print(f"{self.NodeId} -> self Prepare logged")
 					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, result)
 					communication.Multicast('224.1.1.1', 8766, result)
 
 
-				
-
-
 			elif message['type'].upper() == 'PREPARE':
-				# print('LOL')
-				# Verify view and n
+
+
+				# This verifies the message and returns back the body of the message as well for logging
+				# Look at the initialization step for self.log definition
 				verify_p, pToken = handle_requests.Prepare(message, self.ListOfNodes, self.view)
 				verify_m = False
 				for log in self.log:
@@ -140,8 +166,6 @@ class Node(object):
 						if 'm' in log:
 							verify_m = True
 				if verify_p and verify_m:
-					# self.count += 1
-					# print(f"{self.NodeId} ->  others Prepare logging...")
 					self.log = mlog.log(self.log, message)
 					cur_log = mlog.RequestLog(pToken, self.log)
 					self.count = len(cur_log['prepare'])
@@ -150,7 +174,7 @@ class Node(object):
 
 				if self.count >= 2*len(self.ListOfNodes)//3 :
 					if self.mode == 'Prepare':
-						print(f"{self.NodeId} -> CreateCommit##")
+						# print(f"{self.NodeId} -> CreateCommit##")
 						commit = handle_requests.CreateCommit(message, self.NodeId, self.private_key)
 						# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, commit)
 						communication.Multicast('224.1.1.1', 8766, commit)
@@ -174,16 +198,6 @@ class Node(object):
 					reply = handle_requests.CreateReply(message, self.log, self.NodeId, self.private_key)
 					report.Report(self.client_uri, 'reply', reply)
 					self.mode = 'Sleep'
-
-						
-
-				# print(f"{self.NodeId} -> Commit", verify_p)
-
-
-
-				
-
-				
 
 
 	def HandShake(self, uri):

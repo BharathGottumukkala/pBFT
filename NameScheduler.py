@@ -9,7 +9,7 @@ import struct
 
 from communication import *
 from report import Report
-import rsaKeys
+import sign
 
 class NameScheduler(object):
 	"""docstring for NameScheduler"""
@@ -33,7 +33,7 @@ class NameScheduler(object):
 
 	def generateId(self, IpAddr, port, uri, primary):
 		id_ = random.choice(self.ListOfIds)
-		pub, priv = rsaKeys.GenerateKeys(2048)
+		pub, priv = sign.GenerateKeys(2048)
 		pub, priv = pub.exportKey('PEM').decode('utf-8'), priv.exportKey('PEM').decode('utf-8')
 		self.ListOfIds.remove(id_)
 		self.register(id_, IpAddr, port, uri, primary, pub, priv)

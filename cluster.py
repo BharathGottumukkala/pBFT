@@ -1,3 +1,10 @@
+"""
+Flask server creates Cluster by spawing multiple processes
+
+"""
+
+
+
 from multiprocessing import Process, Queue
 from Node import Node
 import random

@@ -9,8 +9,11 @@ import time
 
 
 async def SendMsgRoutine(uri, message):
+	# Asyncronous send used by websockets
 	try:
+		# Connect to node's Uri and send anything
 		async with websockets.connect(uri) as websocket:
+			# We can only send a string
 			if isinstance(message, dict):
 				message = json.dumps(message)
 			else:
@@ -24,6 +27,8 @@ async def SendMsgRoutine(uri, message):
 
 
 def SendMsg(uri, message):
+	# Used by synchronous servers ike flask to send "sort of" async msgs I guess
+	# Mainly for flask to send msgs to websocket servers
 	loop = asyncio.new_event_loop()
 	asyncio.set_event_loop(loop)
 	future = asyncio.ensure_future(SendMsgRoutine(uri, message)) # tasks to do
@@ -31,8 +36,7 @@ def SendMsg(uri, message):
 
 
 async def BroadCast(SenderIp, SenderPort, ListOfClients, Msg):
-	# print(ListOfClients)
-	# a = ListOfClients.copy()
+	# Basically send msgs in a loop. Not a good Idea
 	try:
 		for client in ListOfClients.values():
 			if client['IpAddr'] != SenderIp or client['port'] != SenderPort:
@@ -45,6 +49,10 @@ async def BroadCast(SenderIp, SenderPort, ListOfClients, Msg):
 
 
 def Multicast(MCAST_GRP, MCAST_PORT, msg):
+	# Multicast Send to the multicast server running on each node
+	# I found only 2 multicast grps : 224.1.1.1, 225.1.1.1
+	# We can have any port
+
 	# MCAST_GRP = '225.1.1.1'
 	# MCAST_PORT = 8766
 	MULTICAST_TTL = 10
@@ -58,6 +66,10 @@ def Multicast(MCAST_GRP, MCAST_PORT, msg):
 
 
 def MulticastServer(MCAST_GRP, MCAST_PORT, node):
+	# Defines the server that is running on each node
+	# It receives the message and forwards it to its own websocket server where the request is handled
+
+
 	# MCAST_GRP = '225.1.1.1'
 	# MCAST_PORT = 8766
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -74,12 +86,6 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 		data = json.loads(data)
 
 		SendMsg(node.Uri, data)
-		# if data['type'].upper() == "NEWNODE":
-		# 	print(f"Id {data['id']} joined the network -> {node.NodeId}")
-
-		# elif data['type'].upper() == 'PREPREPARE':
-		# 	print('LOL')
-		# 	print(data)
 			
 
 if __name__ == '__main__':
