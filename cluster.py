@@ -36,13 +36,22 @@ def StartNode(port, IsPrimary, tries=5):
 		if not IsPortFree(port):
 			raise Exception
 
+		# print("Creating Node")
 		node = Node(port, IsPrimary)
+		# print("Creating Node")
+
 		p = Process(target=node.run)
+		# print("Creating Node")
+
 		p.start()
+		# print("Creating Node")
+		
 		return p
 	except Exception as e:
 		print("Retrying...")
+		print(e)
 		port = random.randint(7000, 7100)
+		
 		# port = 8765
 		StartNode(port, IsPrimary, tries-1)
 
@@ -51,16 +60,17 @@ def StartNode(port, IsPrimary, tries=5):
 def Cluster(size, primary):
 	queue = Queue()
 	processes = []
-	port = random.randint(7000, 7100)
+	port = random.randint(7000, 7500)
 	if primary: 
 		p = StartNode(port, True)
 	else:
 		p = StartNode(port, False)
 	processes.append(p)
+	print("Sleeping")
 	time.sleep(0.2)
 
 	for i in range(1, size):
-		port = random.randint(7000, 7100)
+		port = random.randint(7000, 7500)
 		p = StartNode(port, False)
 		processes.append(p)
 		time.sleep(1)

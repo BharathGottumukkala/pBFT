@@ -18,10 +18,10 @@
 	</form> -->
 	<!-- <button onclick="createGame()">Create</button>
 	<div><button onclick="checkStatus()">CheckStatus</button></div> -->
-	<p>Number of clients created: <div id="new"></div></p>
+	<p>Number of clients created: {{ num_nodes }}<div id="new"></div></p>
 
 	<div>
-		<form action="/request_client" name="no_nodes" method="POST">
+		<form action="{{ url_for('interactive') }}" method="POST">
 			<label for="number">Number1:</label>
 			<input type="text" id="n1" name="n1"><br><br>
 			<label for="number">Number2:</label>
@@ -30,6 +30,8 @@
 			
 		</form>
 	</div>
+
+	<p>Reply for request: <div id="reply"></div></p>
 
   
   <script type="text/javascript" charset="utf-8">
@@ -67,6 +69,13 @@
             }
             $('#new').html(numbers_string);
         });
+
+        socket.on('Reply', function(msg) {
+	        console.log("Reply received" + msg.reply);
+
+	        reply_string = 'Reply: ' + '<p>' + msg.reply.toString() + '</p>';
+	        $('#reply').html(reply_string);
+	    });
 
     });
 

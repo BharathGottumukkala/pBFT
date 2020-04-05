@@ -1,5 +1,3 @@
-import sign
-
 import json as js
 import base64
 from Cijfer import hmac, rsa
@@ -48,7 +46,7 @@ class jwt:
         	self.signature = list_algo(self.algorithm).sign(key, msg_to_sign.encode('utf-8'))
 
         	self.token = msg_to_sign + "." + base64.b64encode(self.signature).decode('utf-8')
-        	print(base64.b64encode(self.signature).decode('utf-8'))
+        	# print(base64.b64encode(self.signature).decode('utf-8'))
         else:
         	pass
 
@@ -86,21 +84,31 @@ class jwt:
     	payload = base64.b64decode(payload + "==")
     	payload = js.loads(payload.decode('utf-8'))
     	payload = OrderedDict(sorted(payload.items()))
-    	print(payload)
+    	# print(payload)
     	return payload
 
     def __print_token(self):
     	print(self.token)
 
 if __name__ == '__main__':
+	pass
 
-	pub, priv = sign.GenerateKeys(2048)
-	pub, priv = pub.exportKey('PEM'), priv.exportKey('PEM')
+	# import communication
+	# import time
+	# import sign
 
-	a = jwt(json={"sub": "1234567890","name": "John Doe","iat": "1516239022"}, header={"alg": "RSA","typ": "JWT"}, key=priv)
-	b = a.get_token()
-	print(b)
-	a.get_payload(b)
+	# pub, priv = sign.GenerateKeys(2048)
+	# pub, priv = pub.exportKey('PEM'), priv.exportKey('PEM')
 
-	d = a.verify(pub, b)
-	print(d)
+	# message = {"op": 'add',"args": {"num1": 5, "num2": 6}, "public_key": pub.decode('utf-8	')}
+	# msg = jwt(json=message, header={"alg": "RSA","typ": "Request", "timestamp": int(time.time())}, key=priv)
+	# message = msg.get_token()
+	# reply = communication.SendMsg('ws://192.168.0.107:3932', message)
+
+	# # a = jwt(json={"sub": "1234567890","name": "John Doe","iat": "1516239022"}, header={"alg": "RSA","typ": "JWT"}, key=priv)
+	# # b = a.get_token()
+	# print(message)
+	# # a.get_payload()
+
+	# d = msg.verify(pub, message)
+	# print(d)

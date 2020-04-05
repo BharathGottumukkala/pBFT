@@ -9,6 +9,7 @@ import struct
 
 from communication import *
 from report import Report
+import rsaKeys
 
 class NameScheduler(object):
 	"""docstring for NameScheduler"""
@@ -16,51 +17,60 @@ class NameScheduler(object):
 		self.MaxNodes = 100
 		# Ids start from 1 till MaxNodes
 		self.ListOfIds = [str(i+1) for i in range(self.MaxNodes)]
-		self.ConnectedClients = []
+		self.ConnectedClients = {}
 		# self.Uri = 'ws://localhost:8765'
 		self.node = Node.Node(8765)
 		self.node.NodeId = 0
+		self.flag = True
 
-	def register(self, id, IpAddr, port, uri, primary, public_key):
-		self.ConnectedClients.append({	'id': id, 
-										'IpAddr': IpAddr, 
+	def register(self, id, IpAddr, port, uri, primary, public_key, private_key):
+		self.ConnectedClients[id] = {	'IpAddr': IpAddr, 
 										'port': port,
 										'Uri': uri,
 										'primary': primary,
-										'public_key': public_key}) 
+										'public_key': public_key,
+										'private_key': private_key} 
 
-	def generateId(self, IpAddr, port, uri, primary, public_key):
+	def generateId(self, IpAddr, port, uri, primary):
 		id_ = random.choice(self.ListOfIds)
+		pub, priv = rsaKeys.GenerateKeys(2048)
+		pub, priv = pub.exportKey('PEM').decode('utf-8'), priv.exportKey('PEM').decode('utf-8')
 		self.ListOfIds.remove(id_)
-		self.register(id_, IpAddr, port, uri, primary, public_key)
-		return id_
+		self.register(id_, IpAddr, port, uri, primary, pub, priv)
+		return id_, pub
 
-	async def BroadCastNewNode(self, message, msg):
-		for client in self.ConnectedClients:
-			if client['IpAddr'] != message['IpAddr'] or client['port'] != message['port']:
-				await SendMsgRoutine(client['Uri'], msg)
+	# Update Broadcast
+
+	# async def BroadCastNewNode(self, message, msg):
+	# 	for _, client in self.ConnectedClients.items():
+	# 		if client['IpAddr'] != message['IpAddr'] or client['port'] != message['port']:
+	# 			await SendMsgRoutine(client['Uri'], msg)
 
 	async def IdRoutine(self, websocket, path):
 		async for message in websocket:
+			server = 'http://0.0.0.0:4003'
 			message = json.loads(message)
 			if message['type'].upper() == 'HANDSHAKE':
+				# if self.flag:
+				# 	reply = Report(server, 'new_client')
+
 				exists = False
-				client = [x for i,x in enumerate(self.ConnectedClients) if x['IpAddr']==message['IpAddr'] and x['port']==message['port']]
+				client = [(i,x) for i,x in self.ConnectedClients.items() if x['IpAddr']==message['IpAddr'] and x['port']==message['port']]
 				# print("GODDAMN", client)
 				if len(client):
 					client = client[0]
 					exists = True
-					msg = {'id': client['id'], 'LoN': self.ConnectedClients}
+					msg = {'id': client[0], 'LoN': self.ConnectedClients}
 					msg = json.dumps(msg)
 					await websocket.send(msg)
 					# server = 'http:/' + node.NodeIPAddr + ':5000'
 
 
 				if not exists:
-					client_id = self.generateId(message['IpAddr'], message['port'], message['Uri'], message['primary'], message['public_key'])
+					client_id ,client_pub = self.generateId(message['IpAddr'], message['port'], message['Uri'], message['primary'])
 					print("New Client {}:{} added with ID = {}".format(message['IpAddr'], message['port'], client_id))	
 					a = {'id': client_id, 'LoN': self.ConnectedClients}
-					print(self.ConnectedClients)
+					# print(self.ConnectedClients)
 					try:
 						a = json.dumps(a)
 					except TypeError as e:
@@ -70,11 +80,14 @@ class NameScheduler(object):
 								del client['websocket']
 						a = json.dumps(a)
 					await websocket.send(a)
-					msg = {'type': 'NewNode', 'id': client_id, 'Uri': message['Uri']}
+					del self.ConnectedClients[client_id]['private_key']
 
-					server = 'http://0.0.0.0:5000'
-					m = {'total_clients': len(self.ConnectedClients), 'clients_info': self.ConnectedClients[-1]}
+					msg = {'type': 'NewNode', 'id': client_id, 'Uri': message['Uri'], 'info': self.ConnectedClients[client_id]}
+
+					
+					m = {'total_clients': len(self.ConnectedClients), 'id': client_id, 'clients_info': self.ConnectedClients[client_id]}
 					Report(server, 'client', m)
+
 					# if len(self.ConnectedClients) > 2:
 					# 	Report(server, 'check_clients', {'lol':'lol'})
 					# await self.BroadCastNewNode(message, msg)

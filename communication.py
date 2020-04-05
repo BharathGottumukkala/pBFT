@@ -5,6 +5,7 @@ import struct
 import asyncio
 import websockets
 import json
+import time
 
 
 async def SendMsgRoutine(uri, message):
@@ -17,6 +18,9 @@ async def SendMsgRoutine(uri, message):
 			await websocket.send(message)
 	except Exception as e:
 		print("Error:{}".format(e))
+		print('Retrying...')
+		time.sleep(1)
+		await SendMsgRoutine(uri, message)
 
 
 def SendMsg(uri, message):
@@ -27,10 +31,17 @@ def SendMsg(uri, message):
 
 
 async def BroadCast(SenderIp, SenderPort, ListOfClients, Msg):
-	print(ListOfClients)
-	for client in ListOfClients:
-		if client['IpAddr'] != SenderIp or client['port'] != SenderPort:
-			await SendMsg(client['Uri'], Msg)
+	# print(ListOfClients)
+	# a = ListOfClients.copy()
+	try:
+		for client in ListOfClients.values():
+			if client['IpAddr'] != SenderIp or client['port'] != SenderPort:
+				await SendMsgRoutine(client['Uri'], Msg)
+
+	except RuntimeError as e:
+		print("More Clients found. Updating..")
+		await BroadCast(SenderIp, SenderPort, ListOfClients, Msg)
+
 
 
 def Multicast(MCAST_GRP, MCAST_PORT, msg):
@@ -61,12 +72,19 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 		data = sock.recv(10240)
 		# print(data)
 		data = json.loads(data)
-		if data['type'].upper() == "NEWNODE":
-			print(f"Id {data['id']} joined the network -> {node.NodeId}")
+
+		SendMsg(node.Uri, data)
+		# if data['type'].upper() == "NEWNODE":
+		# 	print(f"Id {data['id']} joined the network -> {node.NodeId}")
+
+		# elif data['type'].upper() == 'PREPREPARE':
+		# 	print('LOL')
+		# 	print(data)
 			
 
 if __name__ == '__main__':
 	# Multicast('224.1.1.1', 8766)
 	message = {'type': 'Request', 'num1': 1, 'num2': 2}
+	SendMsg("ws://192.168.0.113:7086", message)
 	# await SendMsg('ws://localhost:8765', message)
 
