@@ -29,21 +29,19 @@ import report
 
 class Node(object):
 	"""docstring for Node"""
-	def __init__(self, port, IsPrimary=False):
-		self.NodeId = None     
-		self.NodeIPAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show wlp3s0').read()).groups()[0] 
-		print(self.NodeIPAddr)
-		# self.NameSchedulerURI = "ws://" + self.NodeIPAddr + ':' + '8765'
-		self.NameSchedulerURI = "ws://localhost:8765"
-		self.port = port
+	def __init__(self, node_id, private_key, nodes_info, view=0):
+		self.NodeId = node_id
+		self.NodeIPAddr = '127.0.0.1'
+		# self.NameSchedulerURI = "ws://localhost:8765"
+		self.port = nodes_info[self.NodeId]['port']
 		# Decides whether the node is primary
-		self.IsPrimary = IsPrimary
-		self.Uri = "ws://" + self.NodeIPAddr + ':' + str(self.port)
-		self.ListOfNodes = {}
+		self.view = view
+		# self.Uri = "ws://" + self.NodeIPAddr + ':' + str(self.port)
+		self.ListOfNodes = nodes_info
+		self.NumNodes = len(list(nodes_info.keys()))
+		self.private_key = private_key
 		self.pre_prepare_msgs = 0
 		self.mode = 'Sleep'
-		self.view = 0
-		self.count = 0
 		self.log = []
 		"""
 		self.ListOfNodes = {'NodeID': {uska details}}
@@ -52,35 +50,6 @@ class Node(object):
 					"prepare":[List of received prepare msgs],
 					"commit": [List od commit messages]]
 		"""
-
-
-	def register(self, message):
-		# Add newnodes into ListOFNodes
-		del message['type']
-		self.ListOfNodes[message['id']] = message['info']
-
-
-	async def HandshakeRoutine(self, uri):
-		# Get an ID from the NameScheduler for future communication
-		async with websockets.connect(uri) as websocket:
-			if self.NodeId is not None:
-				print(f"My Id is {self.NodeId}")
-			else:
-				message = {'type': 'handshake', 
-							'IpAddr': self.NodeIPAddr, 
-							'port': self.port,
-							'Uri': self.Uri,
-							'primary': self.IsPrimary}
-				message = json.dumps(message)
-
-				await websocket.send(message)
-				recv = await websocket.recv()
-				recv = json.loads(recv)
-				self.NodeId =recv['id']
-				self.ListOfNodes = recv['LoN']
-				self.public_key = self.ListOfNodes[self.NodeId]['public_key'].encode('utf-8')
-				self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
-
 
 	async def RunRoutine(self, websocket, path):
 		# Defines the funcioning of each node on receiving differnet messages
@@ -199,28 +168,23 @@ class Node(object):
 					report.Report(self.client_uri, 'reply', reply)
 					self.mode = 'Sleep'
 
-
-	def HandShake(self, uri):
-		loop = asyncio.new_event_loop()
-		asyncio.set_event_loop(loop)
-		future = asyncio.ensure_future(self.HandshakeRoutine(uri)) # tasks to do
-		loop.run_until_complete(future)
-
-
 	def run(self):
-		if self.NodeId is None:
-			# print("Id not established")
-			self.HandShake(self.NameSchedulerURI)
-
-		# MultiCastServer definition is in communication.py
+		print("I AM ID: {}".format(self.NodeId))
+		#MultiCastServer definition is in communication.py
 		t1 = threading.Thread(target=communication.MulticastServer, args=('224.1.1.1', 8766, self))
 		t1.start()
+
+		print("TRYING TO CREATE A WEBSOCKET")
+		#websocket for p2p
+		loop = asyncio.new_event_loop()
+		asyncio.set_event_loop(loop)
+		future = asyncio.ensure_future(SendMsgRoutine(uri, message))  # tasks to do
+		loop.run_until_complete(future)
 
 		asyncio.get_event_loop().run_until_complete(
 		websockets.serve(self.RunRoutine, self.NodeIPAddr, port=self.port, close_timeout=10000))
 		asyncio.get_event_loop().run_forever()
-
-		t1.join()
+		print("CREATED A WEBSOCKET")
 
 
 

@@ -15,32 +15,34 @@ import sign
 # initialize Flask
 app = Flask(__name__)
 socketio = SocketIO(app)
-primary = False
-ROOMS = {} # dict to track active rooms
+view = 0
 
 port = 4003
 
 ConnectedClients = {}
 reply = {}
-primary = None
+# primary = None
+view = 0
 
 public, private = sign.GenerateKeys(2048)
 public, private = public.exportKey('PEM'), private.exportKey('PEM')
 
 
-def Primary(ConnectedClients):
-	for Client in ConnectedClients.values():
-		if Client['primary']:
-			return Client['Uri']
+# def Primary(ConnectedClients):
+# 	for Client in ConnectedClients.values():
+# 		if Client['primary']:
+# 			return Client['Uri']
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    
 	if request.method == 'GET':
 		return render_template('home.html')
 	if request.method == 'POST':
-
-		print(request.form.get('nodes'))
+		nodes = request.form.get('nodes')
+		faulty_nodes = request.form.get('faulty_nodes')
+		print("nodes: {}, faulty_nodes: {}".format(nodes, faulty_nodes))
+		#create nodes
+		Cluster(int(nodes))
 		return render_template('index.html')
 
 
@@ -65,15 +67,15 @@ def interactive():
 	# return render_template('interactive.html')
 	return render_template('index.html', num_nodes=len(ConnectedClients))
 
-@socketio.on('create')
-def on_create(data):
-	# emit('join_room', {'room': "gaand"})
-	print(data)
-	if len(ConnectedClients):
-		primary = False
-	primary = True
-	p = Process(target=Cluster, args=(int(data['nodes']), primary))
-	p.start()
+# @socketio.on('create')
+# def on_create(data):
+# 	# emit('join_room', {'room': "gaand"})
+# 	print("data", data)
+# 	if len(ConnectedClients):
+# 		primary = False
+# 	primary = True
+# 	p = Process(target=Cluster, args=(int(data['nodes']), primary))
+# 	p.start()
 	# Cluster(data['nodes'])	
 
 @socketio.on('client')
@@ -82,7 +84,7 @@ def on_connect(data):
 	# print(data['clients_info'])
 	ConnectedClients[data['id']] = data['clients_info']
 	# primary = ConnectedClients[0]
-	IpAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show wlp3s0').read()).groups()[0] 
+	IpAddr = 'localhost'#re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show wlp3s0').read()).groups()[0] 
 	message = {'type': 'Client', 'client_id': 1234567890, 'public_key': public.decode('utf-8'), 'Uri': 'http://'+IpAddr+':'+str(port) }
 	socketio.emit('clients', {'number': data['total_clients']})
 	time.sleep(1)
