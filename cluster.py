@@ -53,6 +53,10 @@ def Cluster(size):
 			nodes_info=nodes_info)
 		Process(target=node.run).start()
 
+	print("Returning nodes", nodes_info)
+
+	return nodes_info
+
 
 
 if __name__ == '__main__':

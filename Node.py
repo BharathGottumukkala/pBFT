@@ -168,20 +168,32 @@ class Node(object):
 					report.Report(self.client_uri, 'reply', reply)
 					self.mode = 'Sleep'
 
+	# def HandShake(self, uri):
+	# 	if self.NodeId is not None:
+	# 		print(f"My Id is {self.NodeId}")
+	# 	else:
+	# 		message = {	'IpAddr': self.NodeIPAddr, 
+	# 					'port': self.port,
+	# 					'Uri': self.Uri,
+	# 					'primary': self.IsPrimary}
+	# 		message = json.dumps(message)
+
+	# 		report.Report('handshake', message)
+
 	def run(self):
 		print("I AM ID: {}".format(self.NodeId))
 		#MultiCastServer definition is in communication.py
-		t1 = threading.Thread(target=communication.MulticastServer, args=('224.1.1.1', 8766, self))
-		t1.start()
+		# t1 = threading.Thread(target=communication.MulticastServer, args=('224.1.1.1', 8766, self))
+		# t1.start()
 
 		print("TRYING TO CREATE A WEBSOCKET")
 		#websocket for p2p
 		loop = asyncio.new_event_loop()
 		asyncio.set_event_loop(loop)
-		future = asyncio.ensure_future(SendMsgRoutine(uri, message))  # tasks to do
-		loop.run_until_complete(future)
+		# future = asyncio.ensure_future(websockets.serve(self.RunRoutine, self.NodeIPAddr, port=self.port, close_timeout=10000))
+		# loop.run_forever(future)
 
-		asyncio.get_event_loop().run_until_complete(
+		loop.run_until_complete(
 		websockets.serve(self.RunRoutine, self.NodeIPAddr, port=self.port, close_timeout=10000))
 		asyncio.get_event_loop().run_forever()
 		print("CREATED A WEBSOCKET")

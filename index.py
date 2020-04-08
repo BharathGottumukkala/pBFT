@@ -35,6 +35,7 @@ public, private = public.exportKey('PEM'), private.exportKey('PEM')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+	global ConnectedClients
 	if request.method == 'GET':
 		return render_template('home.html')
 	if request.method == 'POST':
@@ -42,7 +43,7 @@ def index():
 		faulty_nodes = request.form.get('faulty_nodes')
 		print("nodes: {}, faulty_nodes: {}".format(nodes, faulty_nodes))
 		#create nodes
-		Cluster(int(nodes))
+		ConnectedClients = Cluster(int(nodes))
 		return render_template('index.html')
 
 
@@ -54,8 +55,12 @@ def interactive():
 	oper = 'add'
 
 	# Primary = ConnectedClients[0]
-	primary = Primary(ConnectedClients)
+	print(ConnectedClients)
+	import time
+	time.sleep(5)
+	primary = ConnectedClients[view % len(ConnectedClients)]
 	# print(ConnectedClients)
+	primary = "ws://" + primary['Uri'] + ':' + str(primary['port'])
 	print(primary)
 	# socketio.emit
 
@@ -76,7 +81,8 @@ def interactive():
 # 	primary = True
 # 	p = Process(target=Cluster, args=(int(data['nodes']), primary))
 # 	p.start()
-	# Cluster(data['nodes'])	
+	# Cluster(data['nodes'])
+
 
 @socketio.on('client')
 def on_connect(data):
