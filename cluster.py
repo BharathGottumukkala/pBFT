@@ -22,7 +22,8 @@ def IsPortFree(port):
 		s.close()
 		return False
 
-def Cluster(size):
+
+def Cluster(size, client_port, client_uri, client_public_key):
 	#get list of available ports
 	ports = list(filter(IsPortFree, list(range(7000, 7200))))[:size]
 	#get list of asym. keys
@@ -42,10 +43,16 @@ def Cluster(size):
 		i: {
 			'port': ports[i], 
 			'public_key': public_keys[i], 
-			'Uri': '127.0.0.1'
+			'Uri': 'ws://127.0.0.1:' + str(ports[i])
 			}
 		for i in range(size)
 		}
+	# client info
+	nodes_info['client'] = {
+		'port': client_port, 
+		'public_key': client_public_key, 
+		'Uri': client_uri,
+	}
 	#start nodes
 	for i in range(size):
 		node = Node(node_id=i,

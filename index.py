@@ -15,17 +15,18 @@ import sign
 # initialize Flask
 app = Flask(__name__)
 socketio = SocketIO(app)
-view = 0
 
-port = 4003
-
+#server info
 ConnectedClients = {}
+port = 4003
 reply = {}
-# primary = None
-view = 0
 
-public, private = sign.GenerateKeys(2048)
-public, private = public.exportKey('PEM'), private.exportKey('PEM')
+# client info
+view = 0
+client_id = 45023
+client_public_key, client_private_key = sign.GenerateKeys(2048)
+client_public_key, client_private_key = client_public_key.exportKey(
+	'PEM'), client_private_key.exportKey('PEM')
 
 
 # def Primary(ConnectedClients):
@@ -43,7 +44,11 @@ def index():
 		faulty_nodes = request.form.get('faulty_nodes')
 		print("nodes: {}, faulty_nodes: {}".format(nodes, faulty_nodes))
 		#create nodes
-		ConnectedClients = Cluster(int(nodes))
+		ConnectedClients = Cluster(
+								size=int(nodes), 
+								client_port=port, 
+								client_uri='http://127.0.0.1:' +str(port), 
+								client_public_key=client_public_key)
 		return render_template('index.html')
 
 
@@ -56,18 +61,17 @@ def interactive():
 
 	# Primary = ConnectedClients[0]
 	print(ConnectedClients)
-	import time
-	time.sleep(5)
+	# import time
+	# time.sleep(5)
 	primary = ConnectedClients[view % len(ConnectedClients)]
 	# print(ConnectedClients)
-	primary = "ws://" + primary['Uri'] + ':' + str(primary['port'])
-	print(primary)
+	print()
+	print("Primary URI", primary['Uri'])
 	# socketio.emit
-
 	message = {"o": oper,"args": {"num1": num1, "num2": num2}, "t": int(time.time()), "c": 1234567}
-	message = messaging.jwt(json=message, header={"alg": "RSA"}, key=private)
+	message = messaging.jwt(json=message, header={"alg": "RSA"}, key=client_private_key)
 	message = message.get_token()
-	reply = communication.SendMsg(primary, json.dumps({'token': message, 'type': 'Request'}))
+	reply = communication.SendMsg(primary['Uri'], json.dumps({'token': message, 'type': 'Request'}))
 	# reply = await SendMsg(primary['Uri'], message)
 	# return render_template('interactive.html')
 	return render_template('index.html', num_nodes=len(ConnectedClients))

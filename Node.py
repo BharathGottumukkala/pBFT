@@ -37,8 +37,12 @@ class Node(object):
 		# Decides whether the node is primary
 		self.view = view
 		# self.Uri = "ws://" + self.NodeIPAddr + ':' + str(self.port)
-		self.ListOfNodes = nodes_info
-		self.NumNodes = len(list(nodes_info.keys()))
+		self.ListOfNodes = nodes_info.copy()
+		print(list(self.ListOfNodes.keys()))
+		self.client_public_key = self.ListOfNodes['client']['public_key']
+		self.client_uri = self.ListOfNodes['client']['Uri']
+		del self.ListOfNodes['client']
+		self.NumNodes = len(list(nodes_info.keys())) 
 		self.private_key = private_key
 		self.pre_prepare_msgs = 0
 		self.mode = 'Sleep'
@@ -51,6 +55,18 @@ class Node(object):
 					"commit": [List od commit messages]]
 		"""
 
+	def primary_id(self):
+		return self.view % self.NumNodes
+
+	def _REQUEST(self, message):
+		print("View: {}, My_ID: {}, num_nodes: {}".format(self.view, self.NodeId, self.NumNodes))
+		if self.NodeId == self.primary_id():
+			# Current node is primary
+			print(f"I am the primary with ID = {self.NodeId}")
+		else:
+			# TO DO: Redirect to primary
+			print(f"Well I am not the primary with ID = {self.NodeId}")
+
 	async def RunRoutine(self, websocket, path):
 		# Defines the funcioning of each node on receiving differnet messages
 		async for message in websocket:
@@ -58,19 +74,11 @@ class Node(object):
 			# message = {'type': type, 'token': token}
 			# token is generated using messaging library in handle_requests
 			message = json.loads(message)
-			if message['type'].upper() == 'NEWNODE':
-				# When a new node is added, Register the nde's details for future communication
-				print(f"Id {message['id']} joined the network -> {self.NodeId}")
-				self.register(message)
-
-			elif message['type'].upper() == 'REQUEST':
-				# I am yet to implement client broadcasting the reqiest to all secondary nodes
-				if self.IsPrimary:
-					print(f"I am the primary with ID = {self.NodeId}")
-				else:
-					print(f"Well I am not the primary with ID = {self.NodeId}")
+			if message['type'].upper() == 'REQUEST':
+				self._REQUEST(message)
 				# Verify request and returns the next message to send
-				final = handle_requests.Request(message, self.client_public_key, self.view, 100, self.private_key)
+				print("type of private_key", type(self.private_key))
+				final = handle_requests.Request(message, self.client_uri, self.view, 100, self.private_key)
 				
 				if final is not None:
 					print(len(self.ListOfNodes))
@@ -168,35 +176,19 @@ class Node(object):
 					report.Report(self.client_uri, 'reply', reply)
 					self.mode = 'Sleep'
 
-	# def HandShake(self, uri):
-	# 	if self.NodeId is not None:
-	# 		print(f"My Id is {self.NodeId}")
-	# 	else:
-	# 		message = {	'IpAddr': self.NodeIPAddr, 
-	# 					'port': self.port,
-	# 					'Uri': self.Uri,
-	# 					'primary': self.IsPrimary}
-	# 		message = json.dumps(message)
-
-	# 		report.Report('handshake', message)
 
 	def run(self):
 		print("I AM ID: {}".format(self.NodeId))
 		#MultiCastServer definition is in communication.py
-		# t1 = threading.Thread(target=communication.MulticastServer, args=('224.1.1.1', 8766, self))
-		# t1.start()
+		t1 = threading.Thread(target=communication.MulticastServer, args=('224.1.1.1', 8766, self))
+		t1.start()
 
-		print("TRYING TO CREATE A WEBSOCKET")
 		#websocket for p2p
 		loop = asyncio.new_event_loop()
 		asyncio.set_event_loop(loop)
-		# future = asyncio.ensure_future(websockets.serve(self.RunRoutine, self.NodeIPAddr, port=self.port, close_timeout=10000))
-		# loop.run_forever(future)
-
 		loop.run_until_complete(
 		websockets.serve(self.RunRoutine, self.NodeIPAddr, port=self.port, close_timeout=10000))
 		asyncio.get_event_loop().run_forever()
-		print("CREATED A WEBSOCKET")
 
 
 
