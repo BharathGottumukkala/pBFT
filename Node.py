@@ -78,7 +78,7 @@ class Node(object):
 				self._REQUEST(message)
 				# Verify request and returns the next message to send
 				print("type of private_key", type(self.private_key))
-				final = handle_requests.Request(message, self.client_uri, self.view, 100, self.private_key)
+				final = handle_requests.Request(message, self.client_public_key, self.view, 100, self.private_key)
 				
 				if final is not None:
 					print(len(self.ListOfNodes))

@@ -36,7 +36,7 @@ def Cluster(size, client_port, client_uri, client_public_key):
 		pub, priv = sign.GenerateKeys(2048)
 		pub, priv = pub.exportKey('PEM'), priv.exportKey('PEM')
 		public_keys.append(pub)
-		private_keys.append(pub)
+		private_keys.append(priv)
 	print("Took {} seconds to create {} key pairs.".format(time.time() - t, size))
 	#gen. node info for all nodes to use
 	nodes_info = {
