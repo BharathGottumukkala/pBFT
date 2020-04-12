@@ -35,7 +35,7 @@ class Node(object):
 		self.NodeIPAddr = self.GetIp()
 		print(self.NodeIPAddr)
 		# self.NameSchedulerURI = "ws://" + self.NodeIPAddr + ':' + '8765'
-		self.NameSchedulerURI = "ws://localhost:8765"
+		self.NameSchedulerURI = "ws://155.98.38.101:8765"
 		self.port = port
 		# Decides whether the node is primary
 		# self.IsPrimary = IsPrimary
