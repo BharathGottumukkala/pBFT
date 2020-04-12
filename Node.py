@@ -31,7 +31,7 @@ class Node(object):
 	"""docstring for Node"""
 	def __init__(self, port, IsPrimary=False):
 		self.NodeId = None     
-		self.NodeIPAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show wlp3s0').read()).groups()[0] 
+		self.NodeIPAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show enp4s0f1').read()).groups()[0] 
 		print(self.NodeIPAddr)
 		# self.NameSchedulerURI = "ws://" + self.NodeIPAddr + ':' + '8765'
 		self.NameSchedulerURI = "ws://localhost:8765"

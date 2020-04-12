@@ -82,7 +82,7 @@ def on_connect(data):
 	# print(data['clients_info'])
 	ConnectedClients[data['id']] = data['clients_info']
 	# primary = ConnectedClients[0]
-	IpAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show wlp3s0').read()).groups()[0] 
+	IpAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show enp4s0f1').read()).groups()[0] 
 	message = {'type': 'Client', 'client_id': 1234567890, 'public_key': public.decode('utf-8'), 'Uri': 'http://'+IpAddr+':'+str(port) }
 	socketio.emit('clients', {'number': data['total_clients']})
 	time.sleep(1)
