@@ -16,27 +16,28 @@ class NameScheduler(object):
 	def __init__(self):
 		self.MaxNodes = 100
 		# Ids start from 1 till MaxNodes
-		self.ListOfIds = [str(i+1) for i in range(self.MaxNodes)]
+		self.ListOfIds = [str(i) for i in range(self.MaxNodes)]
 		self.ConnectedClients = {}
 		# self.Uri = 'ws://localhost:8765'
 		self.node = Node.Node(8765)
-		self.node.NodeId = 0
+		self.node.NodeId = -1
 		self.flag = True
 
-	def register(self, id, IpAddr, port, uri, primary, public_key, private_key):
+	def register(self, id, IpAddr, port, uri, allocate, public_key, private_key):
 		self.ConnectedClients[id] = {	'IpAddr': IpAddr, 
 										'port': port,
 										'Uri': uri,
-										'primary': primary,
+										'allocate': allocate,
 										'public_key': public_key,
 										'private_key': private_key} 
 
-	def generateId(self, IpAddr, port, uri, primary):
-		id_ = random.choice(self.ListOfIds)
+	def generateId(self, IpAddr, port, uri, allocate):
+		# id_ = random.choice(self.ListOfIds)
+		id_ = self.ListOfIds[0]
 		pub, priv = sign.GenerateKeys(2048)
 		pub, priv = pub.exportKey('PEM').decode('utf-8'), priv.exportKey('PEM').decode('utf-8')
 		self.ListOfIds.remove(id_)
-		self.register(id_, IpAddr, port, uri, primary, pub, priv)
+		self.register(id_, IpAddr, port, uri, allocate, pub, priv)
 		return id_, pub
 
 	# Update Broadcast
@@ -67,7 +68,7 @@ class NameScheduler(object):
 
 
 				if not exists:
-					client_id ,client_pub = self.generateId(message['IpAddr'], message['port'], message['Uri'], message['primary'])
+					client_id ,client_pub = self.generateId(message['IpAddr'], message['port'], message['Uri'], message['allocate'])
 					print("New Client {}:{} added with ID = {}".format(message['IpAddr'], message['port'], client_id))	
 					a = {'id': client_id, 'LoN': self.ConnectedClients}
 					# print(self.ConnectedClients)
@@ -86,6 +87,7 @@ class NameScheduler(object):
 
 					
 					m = {'total_clients': len(self.ConnectedClients), 'id': client_id, 'clients_info': self.ConnectedClients[client_id]}
+					print(m)
 					Report(server, 'client', m)
 
 					# if len(self.ConnectedClients) > 2:

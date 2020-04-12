@@ -85,7 +85,16 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 		# print(data)
 		data = json.loads(data)
 
-		SendMsg(node.Uri, data)
+		if data['type'] == 'Allocate':
+			node.ListOfNodes[node.NodeId]['allocate'] = True
+
+		if data['type'] == 'NewNode':
+			SendMsg(node.Uri, data)
+			
+		# Every node except NameScheduler
+		if node.NodeId != -1:
+			if node.ListOfNodes[node.NodeId]['allocate']:
+				SendMsg(node.Uri, data)
 			
 
 if __name__ == '__main__':

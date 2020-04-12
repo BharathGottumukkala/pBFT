@@ -6,6 +6,7 @@ import time
 import json
 import re
 import os
+import socket
 
 from cluster import Cluster
 import communication
@@ -15,23 +16,49 @@ import sign
 # initialize Flask
 app = Flask(__name__)
 socketio = SocketIO(app)
-primary = False
+
 ROOMS = {} # dict to track active rooms
 
 port = 4003
+MaxNodes = 19
 
 ConnectedClients = {}
 reply = {}
 primary = None
+n = 0
+view = 0
 
 public, private = sign.GenerateKeys(2048)
 public, private = public.exportKey('PEM'), private.exportKey('PEM')
 
+mode = "Emulab"
 
-def Primary(ConnectedClients):
-	for Client in ConnectedClients.values():
-		if Client['primary']:
-			return Client['Uri']
+
+# def Primary(ConnectedClients):
+# 	for Client in ConnectedClients.values():
+# 		if Client['primary']:
+# 			return Client['Uri']
+
+def GetIp():
+	return (
+			(
+				[ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] 
+				if not ip.startswith("127.")] or 
+				[[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) 
+					for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]
+			) 
+			+ ["no IP found"]
+		   )[0]
+
+
+def Allocate(size):
+	global n
+	n = size
+	print(f"Received Allocate request for {size} nodes")
+	for i in range(size):
+		communication.SendMsg(ConnectedClients[str(i)]['Uri'], {'type': "Allocate"})
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -52,7 +79,9 @@ def interactive():
 	oper = 'add'
 
 	# Primary = ConnectedClients[0]
-	primary = Primary(ConnectedClients)
+	# primary = Primary(ConnectedClients)
+	print(ConnectedClients)
+	primary = ConnectedClients[str(view)]['Uri']
 	# print(ConnectedClients)
 	print(primary)
 	# socketio.emit
@@ -67,14 +96,18 @@ def interactive():
 
 @socketio.on('create')
 def on_create(data):
-	# emit('join_room', {'room': "gaand"})
-	print(data)
-	if len(ConnectedClients):
-		primary = False
-	primary = True
-	p = Process(target=Cluster, args=(int(data['nodes']), primary))
-	p.start()
-	# Cluster(data['nodes'])	
+	print(data, n)
+	if mode == "Emulab":
+		Allocate(int(data['nodes']))
+	else:
+		# if len(ConnectedClients):
+		# 	primary = False
+		# primary = True
+		p = Process(target=Cluster, args=(int(data['nodes']), ))
+		p.start()
+		# Cluster(data['nodes'])
+
+	print(data, n)	
 
 @socketio.on('client')
 def on_connect(data):
@@ -82,7 +115,7 @@ def on_connect(data):
 	# print(data['clients_info'])
 	ConnectedClients[data['id']] = data['clients_info']
 	# primary = ConnectedClients[0]
-	IpAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show enp4s0f1').read()).groups()[0] 
+	IpAddr = GetIp()
 	message = {'type': 'Client', 'client_id': 1234567890, 'public_key': public.decode('utf-8'), 'Uri': 'http://'+IpAddr+':'+str(port) }
 	socketio.emit('clients', {'number': data['total_clients']})
 	time.sleep(1)
@@ -112,6 +145,8 @@ def on_reply(data):
 		print("Socket emiting")
 		socketio.emit('Reply', {'reply': reply[token['t']]['r'] })
 		print("Socket emited")
+
+		
 
 
 

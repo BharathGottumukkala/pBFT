@@ -62,6 +62,9 @@ def Prepare(message, ListOfNodes, view):
 	jwt = messaging.jwt()
 	body = jwt.get_payload(token)
 	id = body['i']
+	# print(ListOfNodes)
+	# import time
+	# time.sleep(10)
 
 	verify_p = False
 	if view == body['v']:

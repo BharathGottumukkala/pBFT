@@ -29,15 +29,16 @@ import report
 
 class Node(object):
 	"""docstring for Node"""
-	def __init__(self, port, IsPrimary=False):
+	def __init__(self, port):
 		self.NodeId = None     
-		self.NodeIPAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show enp4s0f1').read()).groups()[0] 
+		# self.NodeIPAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show enp4s0f1').read()).groups()[0] 
+		self.NodeIPAddr = self.GetIp()
 		print(self.NodeIPAddr)
 		# self.NameSchedulerURI = "ws://" + self.NodeIPAddr + ':' + '8765'
 		self.NameSchedulerURI = "ws://localhost:8765"
 		self.port = port
 		# Decides whether the node is primary
-		self.IsPrimary = IsPrimary
+		# self.IsPrimary = IsPrimary
 		self.Uri = "ws://" + self.NodeIPAddr + ':' + str(self.port)
 		self.ListOfNodes = {}
 		self.pre_prepare_msgs = 0
@@ -53,9 +54,23 @@ class Node(object):
 					"commit": [List od commit messages]]
 		"""
 
+	def GetIp(self):
+		return (
+				(
+					[ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] 
+					if not ip.startswith("127.")] or 
+					[[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) 
+						for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]
+				) 
+				+ ["no IP found"]
+			   )[0]
+
+	def IsPrimary(self):
+		return self.view == self.NodeId
+
 
 	def register(self, message):
-		# Add newnodes into ListOFNodes
+		# Add newnodes into ListOfNodes
 		del message['type']
 		self.ListOfNodes[message['id']] = message['info']
 
@@ -70,7 +85,8 @@ class Node(object):
 							'IpAddr': self.NodeIPAddr, 
 							'port': self.port,
 							'Uri': self.Uri,
-							'primary': self.IsPrimary}
+							'allocate': False
+							}
 				message = json.dumps(message)
 
 				await websocket.send(message)
@@ -78,6 +94,7 @@ class Node(object):
 				recv = json.loads(recv)
 				self.NodeId =recv['id']
 				self.ListOfNodes = recv['LoN']
+				print(self.ListOfNodes)
 				self.public_key = self.ListOfNodes[self.NodeId]['public_key'].encode('utf-8')
 				self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
 
@@ -96,7 +113,7 @@ class Node(object):
 
 			elif message['type'].upper() == 'REQUEST':
 				# I am yet to implement client broadcasting the reqiest to all secondary nodes
-				if self.IsPrimary:
+				if self.IsPrimary():
 					print(f"I am the primary with ID = {self.NodeId}")
 				else:
 					print(f"Well I am not the primary with ID = {self.NodeId}")
@@ -120,6 +137,9 @@ class Node(object):
 				else:
 					print(f"{self.NodeId} -> The message verification failed")
 
+			elif message['type'].upper() == 'ALLOCATE':
+				self.ListOfNodes[self.NodeId]['allocate'] = True
+
 			elif message['type'].upper() == 'CLIENT':
 				# Here the message i of different format..fck. Will update this in the next release :p
 				# message = {'type': type, 'client_id': '...', 'public_key':'...', 'Uri': '...'}
@@ -129,14 +149,15 @@ class Node(object):
 				print(f"{self.NodeId} -> Received Client publickey")
 
 			elif message['type'].upper() == 'PREPREPARE':
-				print(f"ID = {self.NodeId}, primary={self.IsPrimary}")
+				print(f"ID = {self.NodeId}, primary={self.IsPrimary()}")
 				# print(message)
-				public_key_primary = None
+				public_key_primary = self.ListOfNodes[str(self.view)]['public_key']
 
 				# Get primary's public key to verify the signature
-				for client in self.ListOfNodes.values():
-					if client['primary']:
-						public_key_primary = client['public_key']
+				# for client in self.ListOfNodes.values():
+				# 	if client['primary']:
+				# 		public_key_primary = client['public_key']
+
 
 				# Send all the details. It will verify and return the next packet to send
 				result = handle_requests.Preprepare(message, self.client_public_key, public_key_primary, self.NodeId, self.private_key, self.view)
@@ -225,16 +246,16 @@ class Node(object):
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description="My parser")
-	feature_parser = parser.add_mutually_exclusive_group(required=False)
-	feature_parser.add_argument('--primary', dest='feature', action='store_true')
-	feature_parser.add_argument('--secondary', dest='feature', action='store_false')
-	parser.set_defaults(feature=False)
-	args = parser.parse_args()
-	print(args.feature)
+	# parser = argparse.ArgumentParser(description="My parser")
+	# feature_parser = parser.add_mutually_exclusive_group(required=False)
+	# feature_parser.add_argument('--primary', dest='feature', action='store_true')
+	# feature_parser.add_argument('--secondary', dest='feature', action='store_false')
+	# parser.set_defaults(feature=False)
+	# args = parser.parse_args()
+	# print(args.feature)
 
-	port = random.randint(2000, 8000)
+	port = random.randint(7000, 7500)
 	print(port)
-	node = Node(port, args.feature)
+	node = Node(port)
 		
 	node.run()
