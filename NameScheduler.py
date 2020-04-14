@@ -60,7 +60,7 @@ class NameScheduler(object):
 	async def IdRoutine(self, websocket, path):
 		async for message in websocket:
 			# server = 'http://155.98.38.44:4003/'
-			serve = 'http://' + config().GetAddress('client') + ":4003/"
+			server = 'http://' + config().GetAddress('client') + ":4003/"
 			message = json.loads(message)
 			if message['type'].upper() == 'HANDSHAKE':
 				# if self.flag:
