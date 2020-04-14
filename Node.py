@@ -88,26 +88,32 @@ class Node(object):
 
 	async def HandshakeRoutine(self, uri):
 		# Get an ID from the NameScheduler for future communication
-		async with websockets.connect(uri) as websocket:
-			if self.NodeId is not None:
-				print(f"My Id is {self.NodeId}")
-			else:
-				message = {'type': 'handshake', 
-							'IpAddr': self.NodeIPAddr, 
-							'port': self.port,
-							'Uri': self.Uri,
-							'allocate': False
-							}
-				message = json.dumps(message)
+		try:
+			async with websockets.connect(uri) as websocket:
+				if self.NodeId is not None:
+					print(f"My Id is {self.NodeId}")
+				else:
+					message = {'type': 'handshake', 
+								'IpAddr': self.NodeIPAddr, 
+								'port': self.port,
+								'Uri': self.Uri,
+								'allocate': False
+								}
+					message = json.dumps(message)
 
-				await websocket.send(message)
-				recv = await websocket.recv()
-				recv = json.loads(recv)
-				self.NodeId =recv['id']
-				self.ListOfNodes = recv['LoN']
-				print(self.ListOfNodes)
-				self.public_key = self.ListOfNodes[self.NodeId]['public_key'].encode('utf-8')
-				self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
+					await websocket.send(message)
+					recv = await websocket.recv()
+					recv = json.loads(recv)
+					self.NodeId =recv['id']
+					self.ListOfNodes = recv['LoN']
+					print(self.ListOfNodes)
+					self.public_key = self.ListOfNodes[self.NodeId]['public_key'].encode('utf-8')
+					self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
+		except Exception as e:
+			print(e)
+			time.sleep(2)
+			print('Retrying...')
+			await self.HandshakeRoutine(uri)
 
 
 	async def RunRoutine(self, websocket, path):
