@@ -6,10 +6,12 @@ import json
 import threading
 import socket
 import struct
+from netifaces import interfaces, ifaddresses, AF_INET
 
 from communication import *
 from report import Report
 import sign
+from config import config
 
 class NameScheduler(object):
 	"""docstring for NameScheduler"""
@@ -18,6 +20,7 @@ class NameScheduler(object):
 		# Ids start from 1 till MaxNodes
 		self.ListOfIds = [str(i) for i in range(self.MaxNodes)]
 		self.ConnectedClients = {}
+		config().UpdateAddress('NameScheduler', self.GetIpLocal())
 		# self.Uri = 'ws://localhost:8765'
 		self.node = Node.Node(8765)
 		self.node.NodeId = -1
@@ -30,6 +33,13 @@ class NameScheduler(object):
 										'allocate': allocate,
 										'public_key': public_key,
 										'private_key': private_key} 
+
+	def GetIpLocal(self):
+                for ifaceName in interfaces():
+                        addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+                        f = addresses[0].split('.')
+                        if f[0] == '10':
+                                return addresses[0]
 
 	def generateId(self, IpAddr, port, uri, allocate):
 		# id_ = random.choice(self.ListOfIds)
@@ -49,7 +59,8 @@ class NameScheduler(object):
 
 	async def IdRoutine(self, websocket, path):
 		async for message in websocket:
-			server = 'http://155.98.38.44:4003/'
+			# server = 'http://155.98.38.44:4003/'
+			serve = 'http://' + config().GetAddress('client') + ":4003/"
 			message = json.loads(message)
 			if message['type'].upper() == 'HANDSHAKE':
 				# if self.flag:

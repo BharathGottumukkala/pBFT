@@ -8,7 +8,7 @@ import time
 import argparse
 import re
 import os
-
+from netifaces import interfaces, ifaddresses, AF_INET
 # Custom imports
 
 # commuication handles Sending messages to different nodes
@@ -26,16 +26,20 @@ import mlog
 # Report back to client for demo purposes
 import report
 
+# Get addresses of client and NameScheduler
+from config import config
+
 
 class Node(object):
 	"""docstring for Node"""
 	def __init__(self, port):
 		self.NodeId = None     
 		# self.NodeIPAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show enp4s0f1').read()).groups()[0] 
-		self.NodeIPAddr = self.GetIp()
+		self.NodeIPAddr = self.GetIpLocal()
 		print(self.NodeIPAddr)
 		# self.NameSchedulerURI = "ws://" + self.NodeIPAddr + ':' + '8765'
-		self.NameSchedulerURI = "ws://155.98.38.101:8765"
+		# self.NameSchedulerURI = "ws://155.98.38.101:8765"
+		self.NameSchedulerURI = "ws://" + config().GetAddress('NameScheduler') + ":8765"
 		self.port = port
 		# Decides whether the node is primary
 		# self.IsPrimary = IsPrimary
@@ -64,6 +68,13 @@ class Node(object):
 				) 
 				+ ["no IP found"]
 			   )[0]
+	
+	def GetIpLocal(self):
+		for ifaceName in interfaces():
+			addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+			f = addresses[0].split('.')
+			if f[0] == '10':
+				return addresses[0]
 
 	def IsPrimary(self):
 		return self.view == self.NodeId
