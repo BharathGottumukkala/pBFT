@@ -59,7 +59,7 @@ def GetIpLocal():
 		if f[0] == '10':
 			return addresses[0]
 
-IpAddr = GetIpLocal()
+IpAddr = GetIp()
 config().UpdateAddress('client', IpAddr)
 
 

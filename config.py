@@ -19,11 +19,13 @@ import json
 # 	with open("config.json", "w") as con:
 # 		json.dump(con, config)
 
+
 class config(object):
 	"""docstring for config"""
 	def __init__(self):
+		self.file = "/users/ConMan/pBFT/config.json"
 		exception = False
-		with open("config.json", "r") as con:
+		with open(self.file, "r") as con:
 			try:
 				config = json.load(con)
 			except Exception as e:
@@ -35,19 +37,19 @@ class config(object):
 
 
 	def UpdateAddress(self, key, value):
-		with open("config.json", "r") as con:
+		with open(self.file, "r") as con:
 			config = json.load(con)
 		config[key] = value
-		with open("config.json", "w") as con:
+		with open(self.file, "w") as con:
 			json.dump(config, con)
 
 	def GetAddress(self, key):
-		with open("config.json", "r") as con:
+		with open(self.file, "r") as con:
 			config = json.load(con)
 			return config[key]
 
 	def InitializeConfig(self):
-		with open("config.json", "w") as con:
+		with open(self.file, "w") as con:
 			json.dump({}, con)
 
 
