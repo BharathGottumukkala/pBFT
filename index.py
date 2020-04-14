@@ -6,12 +6,14 @@ import time
 import json
 import re
 import os
+from netifaces import interfaces, ifaddresses, AF_INET
 import socket
 
 from cluster import Cluster
 import communication
 import messaging
 import sign
+from config import config
 
 # initialize Flask
 app = Flask(__name__)
@@ -49,6 +51,16 @@ def GetIp():
 			) 
 			+ ["no IP found"]
 		   )[0]
+
+def GetIpLocal():
+	for ifaceName in interfaces():
+		addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+		f = addresses[0].split('.')
+		if f[0] == '10':
+			return addresses[0]
+
+IpAddr = GetIpLocal()
+config().UpdateAddress('client', IpAddr)
 
 
 def Allocate(size):
