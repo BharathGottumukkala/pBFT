@@ -71,7 +71,7 @@ class Node(object):
 	
 
 	def IsPrimary(self):
-		return self.view == self.NodeId
+		return self.view == int(self.NodeId)
 
 
 	def register(self, message):
@@ -123,11 +123,13 @@ class Node(object):
 				self.register(message)
 
 			elif message['type'].upper() == 'REQUEST':
-				# I am yet to implement client broadcasting the reqiest to all secondary nodes
+				# I am yet to implement client broadcasting the request to all secondary nodes
 				if self.IsPrimary():
 					print(f"I am the primary with ID = {self.NodeId}")
 				else:
 					print(f"Well I am not the primary with ID = {self.NodeId}")
+
+				# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'request'})
 				# Verify request and returns the next message to send
 				final = handle_requests.Request(message, self.client_public_key, self.view, 100, self.private_key)
 				
@@ -150,6 +152,16 @@ class Node(object):
 
 			elif message['type'].upper() == 'ALLOCATE':
 				self.ListOfNodes[self.NodeId]['allocate'] = True
+				# m = {'id': self.NodeId, 'status': 'allocated'}
+				# report.Report(self.client_uri, 'status', m)
+
+
+			elif message['type'].upper() == 'DeALLOCATE':
+				self.ListOfNodes[self.NodeId]['allocate'] = False
+				# m = {'id': self.NodeId, 'status': 'deallocated'}
+				# report.Report(self.client_uri, 'status', m)
+
+
 
 			elif message['type'].upper() == 'CLIENT':
 				# Here the message i of different format..fck. Will update this in the next release :p
@@ -158,6 +170,9 @@ class Node(object):
 				self.client_public_key = message['public_key'].encode('utf-8')
 				self.client_uri = message['Uri']
 				print(f"{self.NodeId} -> Received Client publickey")
+				if self.IsPrimary():
+					report.Report(self.client_uri, 'status', {'test': 'All the best'})
+
 
 			elif message['type'].upper() == 'PREPREPARE':
 				print(f"ID = {self.NodeId}, primary={self.IsPrimary()}")
@@ -174,6 +189,7 @@ class Node(object):
 				result = handle_requests.Preprepare(message, self.client_public_key, public_key_primary, self.NodeId, self.private_key, self.view)
 				if result is not None:
 					self.mode = 'Prepare'
+					report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'prepare'})
 					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, result)
 					# print(f"{self.NodeId} -> PrePrepare logging...")
 					self.log = mlog.log(self.log, message)
@@ -208,9 +224,11 @@ class Node(object):
 					if self.mode == 'Prepare':
 						# print(f"{self.NodeId} -> CreateCommit##")
 						commit = handle_requests.CreateCommit(message, self.NodeId, self.private_key)
+						report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'commit'})
 						# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, commit)
 						communication.Multicast('224.1.1.1', 8766, commit)
 						self.mode = 'Commit'
+
 						# self.count = 0
 
 			elif message['type'].upper() == 'COMMIT':
@@ -228,8 +246,10 @@ class Node(object):
 					print('\n'*10)
 					print(json.dumps(self.log))
 					reply = handle_requests.CreateReply(message, self.log, self.NodeId, self.private_key)
+					report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'reply'})
 					report.Report(self.client_uri, 'reply', reply)
 					self.mode = 'Sleep'
+					report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'sleep'})
 
 
 	def HandShake(self, uri):

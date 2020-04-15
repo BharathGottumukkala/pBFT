@@ -30,13 +30,8 @@
   <!-- Custom scripts for all pages-->
   <script src="../static/js/temp/sb-admin-2.min.js"></script>
 
-  <!-- <script src="../static/js/temp/Chart.min.js"></script>
-
-  <script src="../static/js/temp/chart-area-demo.js"></script>
-  <script src="../static/js/temp/chart-pie-demo.js"></script> -->
-
   <!-- Page level plugins -->
-  
+  <!-- <script src="vendor/chart.js/Chart.min.js"></script> -->
   <!-- <script src="../static/js/home.js"></script> -->
 
 
@@ -410,7 +405,7 @@
                         </div>
                         <div class="col">
                           <div class="progress progress-sm mr-2">
-                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-info" id="progress_bar" role="progressbar" style="width: 90%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                           </div>
                         </div>
                       </div>
@@ -502,8 +497,8 @@
                       <input type="text" placeholder="Number1" class="form-control bg-light border-0 small" id="n1" name="n1"><br><br><br>
                       <!-- <label for="number">Number2:</label> -->
                       <input type="text" placeholder="Number" class="form-control bg-light border-0 small" id="n2" name="n2"><br><br><br>
-                      <input type="text" placeholder="Result will be shown here.." class="form-control bg-light border-0 small" id="result" value="10" name="result"><br><br><br>
                       <input type="button" class="btn btn-info" id="btnsubmit" value="Submit"><br><br>
+                      <input type="text" placeholder="Result will be shown here.." class="form-control bg-light border-0 small" id="result" name="result"><br><br><br>
                     </form>
                   </div>
                   <!-- <div class="chart-pie pt-4 pb-2">
@@ -597,28 +592,84 @@
               <!-- Project Card Example -->
               <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+                  <h6 class="m-0 font-weight-bold text-primary">Status of Allocated Nodes</h6>
                 </div>
                 <div class="card-body">
-                  <h4 class="small font-weight-bold">Server Migration <span class="float-right">20%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                  <h4 id="0_text" class="small font-weight-bold">Node Id 0 <span class="float-right">20%</span></h4>
+                  <div id="0_bar" class="progress mb-4">
+                    <div class="progress-bar bg-success" id="0_progress" role="progressbar" style="width: 0%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 class="small font-weight-bold">Sales Tracking <span class="float-right">40%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  <h4 id="1_text" class="small font-weight-bold">Node Id 1 <span class="float-right">40%</span></h4>
+                  <div id="1_bar" class="progress mb-4">
+                    <div  id="1_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 class="small font-weight-bold">Customer Database <span class="float-right">60%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                  <h4 id="2_text" class="small font-weight-bold">Node Id 2 <span class="float-right">40%</span></h4>
+                  <div id="2_bar" class="progress mb-4">
+                    <div  id="2_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 class="small font-weight-bold">Payout Details <span class="float-right">80%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                  <h4 id="3_text" class="small font-weight-bold">Node Id 3 <span class="float-right">40%</span></h4>
+                  <div id="3_bar" class="progress mb-4">
+                    <div  id="3_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 class="small font-weight-bold">Account Setup <span class="float-right">Complete!</span></h4>
-                  <div class="progress">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                  <h4 id="4_text" class="small font-weight-bold">Node Id 4 <span class="float-right">40%</span></h4>
+                  <div id="4_bar" class="progress mb-4">
+                    <div  id="4_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="5_text" class="small font-weight-bold">Node Id 5 <span class="float-right">40%</span></h4>
+                  <div id="5_bar" class="progress mb-4">
+                    <div  id="5_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="6_text" class="small font-weight-bold">Node Id 6 <span class="float-right">40%</span></h4>
+                  <div id="6_bar" class="progress mb-4">
+                    <div  id="6_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="7_text" class="small font-weight-bold">Node Id 7 <span class="float-right">40%</span></h4>
+                  <div id="7_bar" class="progress mb-4">
+                    <div  id="7_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="8_text" class="small font-weight-bold">Node Id 8 <span class="float-right">40%</span></h4>
+                  <div id="8_bar" class="progress mb-4">
+                    <div  id="8_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="9_text" class="small font-weight-bold">Node Id 9 <span class="float-right">40%</span></h4>
+                  <div id="9_bar" class="progress mb-4">
+                    <div  id="9_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="10_text" class="small font-weight-bold">Node Id 10 <span class="float-right">40%</span></h4>
+                  <div id="10_bar" class="progress mb-4">
+                    <div  id="10_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="11_text" class="small font-weight-bold">Node Id 11 <span class="float-right">40%</span></h4>
+                  <div id="11_bar" class="progress mb-4">
+                    <div  id="11_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="12_text" class="small font-weight-bold">Node Id 12 <span class="float-right">40%</span></h4>
+                  <div id="12_bar" class="progress mb-4">
+                    <div  id="12_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="13_text" class="small font-weight-bold">Node Id 13 <span class="float-right">40%</span></h4>
+                  <div id="13_bar" class="progress mb-4">
+                    <div  id="13_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="14_text" class="small font-weight-bold">Node Id 14 <span class="float-right">40%</span></h4>
+                  <div id="14_bar" class="progress mb-4">
+                    <div  id="14_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="15_text" class="small font-weight-bold">Node Id 15 <span class="float-right">40%</span></h4>
+                  <div id="15_bar" class="progress mb-4">
+                    <div  id="15_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="16_text" class="small font-weight-bold">Node Id 16 <span class="float-right">40%</span></h4>
+                  <div id="16_bar" class="progress mb-4">
+                    <div  id="16_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="17_text" class="small font-weight-bold">Node Id 17 <span class="float-right">40%</span></h4>
+                  <div id="17_bar" class="progress mb-4">
+                    <div  id="17_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <h4 id="18_text" class="small font-weight-bold">Node Id 18 <span class="float-right">40%</span></h4>
+                  <div id="18_bar" class="progress mb-4">
+                    <div  id="18_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
                 </div>
               </div>
@@ -686,7 +737,7 @@
                 </div>
                 <div class="card-body">
                   <div class="text-center">
-                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;" src="../static/js/temp/img/undraw_posting_photo.svg" alt="">
+                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;" src="img/undraw_posting_photo.svg" alt="">
                   </div>
                   <p>Add some quality, svg illustrations to your project courtesy of <a target="_blank" rel="nofollow" href="https://undraw.co/">unDraw</a>, a constantly updated collection of beautiful svg images that you can use completely free and without attribution!</p>
                   <a target="_blank" rel="nofollow" href="https://undraw.co/">Browse Illustrations on unDraw &rarr;</a>
@@ -756,13 +807,17 @@
   <script type="text/javascript" charset="utf-8">
 
     var socket = io.connect('http://' + document.domain + ':' + location.port);
+    // $('#progress_bar').css('width' , '100%');
+    var i;
+    for(i=0; i<19; i++){
+      $('#' + i.toString() + '_text').hide();
+      $('#' + i.toString() + '_bar').hide();
+      $('#' + i.toString() + '_progress').hide();
 
-    $('#btndealloc').click(function (e) {
-      console.log('Deallocating nodes...');
-      var value = $('#deallocate').val();
-
-      socket.emit('deallocate', {nodes: value});
-    });
+    }
+    // $('#1_text').hide();
+    // $('#1_bar').hide();
+    // $('#1_progress').hide();
 
     $('#btnalloc').click(function (e) {
       console.log('Allocating nodes...');
@@ -771,13 +826,20 @@
       socket.emit('allocate', {nodes: value});
     });
 
+    $('#btndealloc').click(function (e) {
+      console.log('DeAllocating nodes...');
+      var value = $('#deallocate').val();
+
+      socket.emit('deallocate', {nodes: value});
+    });
+
     $('#btnsubmit').click(function (e) {
 
       var value = {
                     'n1': $('#n1').val(),
                     'n2': $('#n2').val()
                   };
-      console.log("value = "+ JSON.stringify(value));
+      console.log("vaue = "+ JSON.stringify(value));
       $.ajax({
         type: 'POST',
         url: "{{ url_for('interactive') }}",
@@ -814,6 +876,48 @@
         $('#alloc_nodes').text(msg.total);
       });
 
+      socket.on('status', function(msg) {
+        console.log("Status " + msg['status'] + "by Node " + msg['id']);
+        if(msg['status'] == 'allocated'){
+          $('#' + msg['id'].toString() + '_text').show();
+          $('#' + msg['id'].toString() + '_bar').show();
+          $('#' + msg['id'].toString() + '_progress').show(); 
+        }
+        else if (msg['status'] == 'deallocated'){
+          $('#' + msg['id'].toString() + '_text').hide();
+          $('#' + msg['id'].toString() + '_bar').hide();
+          $('#' + msg['id'].toString() + '_progress').hide(); 
+        }
+        else if (msg['status'] == 'request'){
+          // $('#' + msg['id'].toString() + '_text').hide();
+          // $('#' + msg['id'].toString() + '_bar').hide();
+          $('#' + msg['id'].toString() + '_progress').css('width' , '10%'); 
+        }
+        else if (msg['status'] == 'prepare'){
+          // $('#' + msg['id'].toString() + '_text').hide();
+          // $('#' + msg['id'].toString() + '_bar').hide();
+          $('#' + msg['id'].toString() + '_progress').css('width' , '40%'); 
+        }
+        else if (msg['status'] == 'commit'){
+          // $('#' + msg['id'].toString() + '_text').hide();
+          // $('#' + msg['id'].toString() + '_bar').hide();
+          $('#' + msg['id'].toString() + '_progress').css('width' , '70%'); 
+        }
+        else if (msg['status'] == 'reply'){
+          // $('#' + msg['id'].toString() + '_text').hide();
+          // $('#' + msg['id'].toString() + '_bar').hide();
+          $('#' + msg['id'].toString() + '_progress').css('width' , '100%'); 
+        }
+        else if (msg['status'] == 'sleep'){
+          // $('#' + msg['id'].toString() + '_text').hide();
+          // $('#' + msg['id'].toString() + '_bar').hide();
+          $('#' + msg['id'].toString() + '_progress').css('width' , '0%'); 
+        }
+          
+      });
+
+
+
   });
 
   </script>
@@ -821,7 +925,8 @@
   
 
   <!-- Page level custom scripts -->
-  
+  <!-- <script src="js/demo/chart-area-demo.js"></script> -->
+  <!-- <script src="js/demo/chart-pie-demo.js"></script> -->
 
 </body>
 

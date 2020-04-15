@@ -7,6 +7,7 @@ import json
 import re
 import os
 import socket
+
 from cluster import Cluster
 import communication
 import messaging
@@ -16,6 +17,8 @@ from config import config
 # initialize Flask
 app = Flask(__name__)
 socketio = SocketIO(app)
+
+
 
 ROOMS = {} # dict to track active rooms
 
@@ -31,11 +34,14 @@ view = 0
 nodes_info = {'available': 0, 'faulty': 0,
 				'allocated': 0}
 
+print("Genrerating Keys")
 public, private = sign.GenerateKeys(2048)
 public, private = public.exportKey('PEM'), private.exportKey('PEM')
-
+print("Generated Keys ")
 mode = "Emulab"
 
+# NameSchedulerURI = config().GetAddress('NameScheduler')
+# communication.UpdateNodeDetails("ws://" + NameSchedulerURI + ":8765")
 
 # def Primary(ConnectedClients):
 # 	for Client in ConnectedClients.values():
@@ -63,14 +69,16 @@ def Allocate(size):
 	for i in range(size):
 		communication.SendMsg(ConnectedClients[str(i)]['Uri'], {'type': "Allocate"})
 		socketio.emit('allocated', {'total': str(i+1)})
+		socketio.emit('status', {'id': i, 'status': 'allocated'})
 		# time.sleep(0.2)
 
-def DeAllocate(size):
+def DeAllocate(size, nodes_info):
 	print(f"Received DeAllocate request for {size} nodes")
 	for i in range(size):
-		communication.SendMsg(ConnectedClients[str(size - i - 1)]['Uri'], {'type': "DeAllocate"})
-		nodes_info['allocated'] -= 1
-		socketio.emit('allocated', {'total': str(nodes_info['allocated'])})
+		communication.SendMsg(ConnectedClients[str(nodes_info['allocated'] - i - 1)]['Uri'], {'type': "DeAllocate"})
+		socketio.emit('allocated', {'total': str(nodes_info['allocated'] - i -1)})
+		socketio.emit('status', {'id': str(nodes_info['allocated'] - i - 1), 'status': 'deallocated'})
+	nodes_info['allocated'] -= size
 
 
 
@@ -97,7 +105,7 @@ def interactive():
 
 	# Primary = ConnectedClients[0]
 	# primary = Primary(ConnectedClients)
-	print(ConnectedClients)
+	# print(ConnectedClients)
 	primary = ConnectedClients[str(view)]['Uri']
 	# print(ConnectedClients)
 	print(primary)
@@ -106,7 +114,9 @@ def interactive():
 	message = {"o": oper,"args": {"num1": num1, "num2": num2}, "t": int(time.time()), "c": 1234567}
 	message = messaging.jwt(json=message, header={"alg": "RSA"}, key=private)
 	message = message.get_token()
-	reply = communication.SendMsg(primary, json.dumps({'token': message, 'type': 'Request'}))
+	print("sending message")
+	communication.SendMsg(primary, json.dumps({'token': message, 'type': 'Request'}))
+	print("message sent")
 	# reply = await SendMsg(primary['Uri'], message)
 	# return render_template('interactive.html')
 	# return render_template('index.html', num_nodes=len(ConnectedClients))
@@ -143,7 +153,7 @@ def on_deallocate(data):
 	global nodes_info, n
 	print(data, n)
 	if mode == "Emulab":
-		DeAllocate(min(int(data['nodes']), nodes_info['allocated']))
+		DeAllocate(min(int(data['nodes']), nodes_info['allocated']), nodes_info)
 		nodes_info['allocated'] -= min(int(data['nodes']), nodes_info['allocated'])
 		n -= min(int(data['nodes']), nodes_info['allocated'])
 	print(nodes_info, data)
@@ -158,8 +168,8 @@ def on_connect(data):
 	IpAddr = GetIp()
 	message = {'type': 'Client', 'client_id': 1234567890, 'public_key': public.decode('utf-8'), 'Uri': 'http://'+IpAddr+':'+str(port) }
 	socketio.emit('clients', {'number': data['total_clients']})
-	time.sleep(1)
-	reply = communication.SendMsg(data['clients_info']['Uri'], message)
+	# time.sleep(1)
+	communication.SendMsg(data['clients_info']['Uri'], message)
 	# socketio.emit('log', {'no_clients': len(ConnectedClients), 'recv_client_info': ConnectedClients})
 
 @socketio.on('check_clients')
@@ -185,6 +195,12 @@ def on_reply(data):
 		print("Socket emiting")
 		socketio.emit('Reply', {'reply': reply[token['t']]['r'] })
 		print("Socket emited")
+
+@socketio.on('status')
+def on_status(data):
+	print("In status")
+	print(f'status received {data}')
+	socketio.emit('status', data)
 
 
 if __name__ == '__main__':

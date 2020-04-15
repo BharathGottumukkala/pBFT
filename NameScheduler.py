@@ -101,6 +101,17 @@ class NameScheduler(object):
 					# await self.BroadCastNewNode(message, msg)
 					# await BroadCast(message['IpAddr'], message['port'], self.ConnectedClients, msg)
 					Multicast('224.1.1.1', 8766, msg)
+
+			elif message['type'] == "UpdateDetails":
+				print(self.ConnectedClients)
+				for i in range(10, 0, -1):
+					print(f"Updating Client in {i}")
+					time.sleep(1)
+				for key, value in self.ConnectedClients.items():
+					m = {'total_clients': int(key)+1, 'id': key, 'clients_info': value}
+					Report(server, 'client', m)
+
+
 					
 
 	def SocketServer(self):

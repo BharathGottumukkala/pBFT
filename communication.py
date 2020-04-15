@@ -8,6 +8,28 @@ import json
 import time
 from netifaces import interfaces, ifaddresses, AF_INET
 
+import report
+from config import config
+
+def UpdateNodeDetails(NameSchedulerURI):
+	# Check If NameScheduler is online
+	try:
+		# Send an empty msg to NameScheduler
+		SendMsg(NameSchedulerURI, {'type': 'Null'})
+		# If NameScheduler is online
+		try:
+			message = {'type': "UpdateDetails"}
+			SendMsg(NameSchedulerURI, message)
+
+		except Exception as e:
+			print("Nested try")
+			print(e)
+
+	except Exception as e:
+		# If exception occurs, NameScheduler is offilne. Nothing to update
+		return
+
+
 
 def GetLocalIp():
 	for ifaceName in interfaces():
@@ -96,8 +118,12 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 		# print(data)
 		data = json.loads(data)
 
-		if data['type'] == 'Allocate':
-			node.ListOfNodes[node.NodeId]['allocate'] = True
+		# if data['type'] == 'Allocate':
+		# 	print(f"Received Allocate request -> {node.NodeId}")
+		# 	node.ListOfNodes[node.NodeId]['allocate'] = True
+		# 	m = {'id': node.NodeId, 'status': 'allocated'}
+		# 	server = config().GetAddress('client')
+		# 	report.Report(server, 'status_rep', m)
 
 		if data['type'] == 'NewNode':
 			SendMsg(node.Uri, data)
@@ -107,13 +133,13 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 			if node.ListOfNodes[node.NodeId]['allocate']:
 				SendMsg(node.Uri, data)
 
-		if data['type'] == 'DeAllocate':
-			node.ListOfNodes[node.NodeId]['allocate'] = False
+		# if data['type'] == 'DeAllocate':
+		# 	node.ListOfNodes[node.NodeId]['allocate'] = False
 			
 
 if __name__ == '__main__':
 	# Multicast('224.1.1.1', 8766)
-	message = {'type': 'Request', 'num1': 1, 'num2': 2}
-	SendMsg("ws://192.168.0.113:7086", message)
+	message = {'type': 'Test', 'num1': 1, 'num2': 2}
+	SendMsg("ws://192.168.0.104:7052", message)
 	# await SendMsg('ws://localhost:8765', message)
 

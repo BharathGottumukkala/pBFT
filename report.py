@@ -18,7 +18,7 @@ def Report(server, handle, message):
 		time.sleep(0.5)
 		sio.disconnect()
 	except Exception as e:
-		print('Trying to update client again')
+		print(f'Trying to update client again and the error is {e}')
 		time.sleep(0.5)
 		Report(server, handle, message)
 	
