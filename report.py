@@ -13,7 +13,7 @@ def Report(server, handle, message):
 	try:
 		sio = socketio.Client()
 		sio.connect(server)
-		print('my sid is', sio.sid)
+		# print('my sid is', sio.sid)
 		sio.emit(handle, message)
 		time.sleep(0.5)
 		sio.disconnect()

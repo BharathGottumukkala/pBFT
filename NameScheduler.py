@@ -6,6 +6,13 @@ import json
 import threading
 import socket
 import struct
+from utils import boolean
+
+#for quicker testing
+import argparse
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--OPTIMIZE', type=boolean, help='Do NOT use this for the final result', default=False)
+args = parser.parse_args()
 
 from communication import *
 from report import Report
@@ -34,8 +41,14 @@ class NameScheduler(object):
 	def generateId(self, IpAddr, port, uri, allocate):
 		# id_ = random.choice(self.ListOfIds)
 		id_ = self.ListOfIds[0]
-		pub, priv = sign.GenerateKeys(2048)
-		pub, priv = pub.exportKey('PEM').decode('utf-8'), priv.exportKey('PEM').decode('utf-8')
+		if args.OPTIMIZE:
+			import pickle
+			print("Unpickling keys for id:", id_)
+			pub = pickle.load(open("keys/pub{}.pickle".format(id_), 'rb'))
+			priv = pickle.load(open("keys/priv{}.pickle".format(id_), 'rb'))
+		else:
+			pub, priv = sign.GenerateKeys(2048)
+			pub, priv = pub.exportKey('PEM').decode('utf-8'), priv.exportKey('PEM').decode('utf-8')
 		self.ListOfIds.remove(id_)
 		self.register(id_, IpAddr, port, uri, allocate, pub, priv)
 		return id_, pub
@@ -49,7 +62,7 @@ class NameScheduler(object):
 
 	async def IdRoutine(self, websocket, path):
 		async for message in websocket:
-			server = 'http://155.98.38.44:4003/'
+			server = 'http://0.0.0.0:4003/'
 			message = json.loads(message)
 			if message['type'].upper() == 'HANDSHAKE':
 				# if self.flag:
@@ -87,7 +100,7 @@ class NameScheduler(object):
 
 					
 					m = {'total_clients': len(self.ConnectedClients), 'id': client_id, 'clients_info': self.ConnectedClients[client_id]}
-					print(m)
+					# print(m)
 					Report(server, 'client', m)
 
 					# if len(self.ConnectedClients) > 2:
@@ -102,8 +115,7 @@ class NameScheduler(object):
 
 
 	def Id_websocket(self):
-		asyncio.get_event_loop().run_until_complete(
-		    websockets.serve(self.IdRoutine, port=8765, close_timeout=10000))
+		asyncio.get_event_loop().run_until_complete(websockets.serve(self.IdRoutine, port=8765, close_timeout=10000))
 		asyncio.get_event_loop().run_forever()
 
 	def Id(self):

@@ -74,11 +74,6 @@ def Cluster(size):
 		processes.append(p)
 		time.sleep(1)
 
-	for p in processes:
-		print("DAMN")
-		p.join()
-		print("IT")
-
 
 if __name__ == '__main__':
 	# IsPortFree(7036)

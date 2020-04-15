@@ -56,6 +56,7 @@ def Allocate(size):
 	n = size
 	print(f"Received Allocate request for {size} nodes")
 	for i in range(size):
+		# print("Allocate", ConnectedClients[str(i)]['Uri'])
 		communication.SendMsg(ConnectedClients[str(i)]['Uri'], {'type': "Allocate"})
 
 
