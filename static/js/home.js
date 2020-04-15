@@ -40,12 +40,12 @@ $(document).ready(function(){
         if (numbers_received.length >= 1){
             numbers_received.shift()
         }            
-        numbers_received.push(msg.number);
-        numbers_string = 'Connected Clients: ';
-        for (var i = 0; i < numbers_received.length; i++){
-            numbers_string = numbers_string + '<p>' + numbers_received[i].toString() + '</p>';
-        }
-        $('#new').html(numbers_string);
+        // numbers_received.push(msg.number);
+        // numbers_string = 'Connected Clients: ';
+        // for (var i = 0; i < numbers_received.length; i++){
+        //     numbers_string = numbers_string + '<p>' + numbers_received[i].toString() + '</p>';
+        // }
+        $('#nodes').html(msg.number);
     });
 
     socket.on('Reply', function(msg) {

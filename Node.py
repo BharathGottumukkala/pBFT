@@ -8,7 +8,6 @@ import time
 import argparse
 import re
 import os
-from netifaces import interfaces, ifaddresses, AF_INET
 # Custom imports
 
 # commuication handles Sending messages to different nodes
@@ -35,7 +34,8 @@ class Node(object):
 	def __init__(self, port):
 		self.NodeId = None     
 		# self.NodeIPAddr = re.search(re.compile(r'(?<=inet )(.*)(?=\/)', re.M), os.popen('ip addr show enp4s0f1').read()).groups()[0] 
-		self.NodeIPAddr = self.GetIpLocal()
+		# self.NodeIPAddr = self.GetIpLocal()
+		self.NodeIPAddr = communication.GetLocalIp()
 		print(self.NodeIPAddr)
 		# self.NameSchedulerURI = "ws://" + self.NodeIPAddr + ':' + '8765'
 		# self.NameSchedulerURI = "ws://155.98.38.101:8765"
@@ -69,12 +69,6 @@ class Node(object):
 				+ ["no IP found"]
 			   )[0]
 	
-	def GetIpLocal(self):
-		for ifaceName in interfaces():
-			addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-			f = addresses[0].split('.')
-			if f[0] == '10':
-				return addresses[0]
 
 	def IsPrimary(self):
 		return self.view == self.NodeId

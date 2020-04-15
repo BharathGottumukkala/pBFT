@@ -6,9 +6,7 @@ import time
 import json
 import re
 import os
-from netifaces import interfaces, ifaddresses, AF_INET
 import socket
-
 from cluster import Cluster
 import communication
 import messaging
@@ -29,6 +27,9 @@ reply = {}
 primary = None
 n = 0
 view = 0
+
+nodes_info = {'available': 0, 'faulty': 0,
+				'allocated': 0}
 
 public, private = sign.GenerateKeys(2048)
 public, private = public.exportKey('PEM'), private.exportKey('PEM')
@@ -52,40 +53,44 @@ def GetIp():
 			+ ["no IP found"]
 		   )[0]
 
-def GetIpLocal():
-	for ifaceName in interfaces():
-		addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-		f = addresses[0].split('.')
-		if f[0] == '10':
-			return addresses[0]
 
 IpAddr = GetIp()
 config().UpdateAddress('client', IpAddr)
 
 
 def Allocate(size):
-	global n
-	n = size
 	print(f"Received Allocate request for {size} nodes")
 	for i in range(size):
 		communication.SendMsg(ConnectedClients[str(i)]['Uri'], {'type': "Allocate"})
+		socketio.emit('allocated', {'total': str(i+1)})
+		# time.sleep(0.2)
+
+def DeAllocate(size):
+	print(f"Received DeAllocate request for {size} nodes")
+	for i in range(size):
+		communication.SendMsg(ConnectedClients[str(size - i - 1)]['Uri'], {'type': "DeAllocate"})
+		nodes_info['allocated'] -= 1
+		socketio.emit('allocated', {'total': str(nodes_info['allocated'])})
+
+
 
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+	return render_template('index.html', nodes_info=nodes_info)
     
-	if request.method == 'GET':
-		return render_template('home.html')
-	if request.method == 'POST':
+	# if request.method == 'GET':
+	# 	return render_template('home.html')
+	# if request.method == 'POST':
 
-		print(request.form.get('nodes'))
-		return render_template('index.html')
-
+	# 	print(request.form.get('nodes'))
+	# 	return render_template('index.html')
 
 @app.route('/request_client', methods=['POST'])
 def interactive():
-	data = request.values
+	# data = request.values
+	data = request.json
 	num1 = data['n1']
 	num2 = data['n2']
 	oper = 'add'
@@ -104,7 +109,8 @@ def interactive():
 	reply = communication.SendMsg(primary, json.dumps({'token': message, 'type': 'Request'}))
 	# reply = await SendMsg(primary['Uri'], message)
 	# return render_template('interactive.html')
-	return render_template('index.html', num_nodes=len(ConnectedClients))
+	# return render_template('index.html', num_nodes=len(ConnectedClients))
+	return "Success"
 
 @socketio.on('create')
 def on_create(data):
@@ -121,11 +127,33 @@ def on_create(data):
 
 	print(data, n)	
 
+@socketio.on('allocate')
+def on_allocate(data):
+	global nodes_info, n
+	print(data, n)
+	if mode == "Emulab":
+		Allocate(min(int(data['nodes']), nodes_info['available']))
+		nodes_info['allocated'] = min(int(data['nodes']), nodes_info['available'])
+		n = min(int(data['nodes']), nodes_info['available'])
+	print(nodes_info, data)
+
+
+@socketio.on('deallocate')
+def on_deallocate(data):
+	global nodes_info, n
+	print(data, n)
+	if mode == "Emulab":
+		DeAllocate(min(int(data['nodes']), nodes_info['allocated']))
+		nodes_info['allocated'] -= min(int(data['nodes']), nodes_info['allocated'])
+		n -= min(int(data['nodes']), nodes_info['allocated'])
+	print(nodes_info, data)
+
 @socketio.on('client')
 def on_connect(data):
 	print('connect initialized')
 	# print(data['clients_info'])
 	ConnectedClients[data['id']] = data['clients_info']
+	nodes_info['available'] = len(ConnectedClients)
 	# primary = ConnectedClients[0]
 	IpAddr = GetIp()
 	message = {'type': 'Client', 'client_id': 1234567890, 'public_key': public.decode('utf-8'), 'Uri': 'http://'+IpAddr+':'+str(port) }
@@ -157,10 +185,6 @@ def on_reply(data):
 		print("Socket emiting")
 		socketio.emit('Reply', {'reply': reply[token['t']]['r'] })
 		print("Socket emited")
-
-		
-
-
 
 
 if __name__ == '__main__':

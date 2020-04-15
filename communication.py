@@ -6,6 +6,17 @@ import asyncio
 import websockets
 import json
 import time
+from netifaces import interfaces, ifaddresses, AF_INET
+
+
+def GetLocalIp():
+	for ifaceName in interfaces():
+		addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+		f = addresses[0].split('.')
+		if f[0] == '10':
+			return addresses[0]
+		elif f[0] == '192':
+			return addresses[0]
 
 
 async def SendMsgRoutine(uri, message):
@@ -95,6 +106,9 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 		if node.NodeId != -1:
 			if node.ListOfNodes[node.NodeId]['allocate']:
 				SendMsg(node.Uri, data)
+
+		if data['type'] == 'DeAllocate':
+			node.ListOfNodes[node.NodeId]['allocate'] = False
 			
 
 if __name__ == '__main__':

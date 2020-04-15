@@ -23,7 +23,15 @@ import json
 class config(object):
 	"""docstring for config"""
 	def __init__(self):
-		self.file = "/users/ConMan/pBFT/config.json"
+
+		try:
+			self.file = "/users/ConMan/pBFT/config.json"
+			with open(self.file, "r") as con:
+				pass
+		except Exception as e:
+			self.file = "config.json"
+
+		# self.file = "/users/ConMan/pBFT/config.json"
 		exception = False
 		with open(self.file, "r") as con:
 			try:

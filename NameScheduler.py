@@ -6,7 +6,7 @@ import json
 import threading
 import socket
 import struct
-from netifaces import interfaces, ifaddresses, AF_INET
+
 
 from communication import *
 from report import Report
@@ -20,7 +20,7 @@ class NameScheduler(object):
 		# Ids start from 1 till MaxNodes
 		self.ListOfIds = [str(i) for i in range(self.MaxNodes)]
 		self.ConnectedClients = {}
-		config().UpdateAddress('NameScheduler', self.GetIpLocal())
+		config().UpdateAddress('NameScheduler', GetLocalIp())
 		# self.Uri = 'ws://localhost:8765'
 		self.node = Node.Node(8765)
 		self.node.NodeId = -1
@@ -34,12 +34,7 @@ class NameScheduler(object):
 										'public_key': public_key,
 										'private_key': private_key} 
 
-	def GetIpLocal(self):
-                for ifaceName in interfaces():
-                        addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-                        f = addresses[0].split('.')
-                        if f[0] == '10':
-                                return addresses[0]
+
 
 	def generateId(self, IpAddr, port, uri, allocate):
 		# id_ = random.choice(self.ListOfIds)
