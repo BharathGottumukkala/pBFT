@@ -7,6 +7,7 @@ import json
 import re
 import os
 import socket
+import threading
 
 from cluster import Cluster
 import communication
@@ -14,11 +15,10 @@ import messaging
 import sign
 from config import config
 
+
 # initialize Flask
 app = Flask(__name__)
 socketio = SocketIO(app)
-
-
 
 ROOMS = {} # dict to track active rooms
 
@@ -27,6 +27,7 @@ MaxNodes = 19
 
 ConnectedClients = {}
 reply = {}
+view_change = {}
 primary = None
 n = 0
 view = 0
@@ -34,14 +35,11 @@ view = 0
 nodes_info = {'available': 0, 'faulty': 0,
 				'allocated': 0}
 
-print("Genrerating Keys")
 public, private = sign.GenerateKeys(2048)
 public, private = public.exportKey('PEM'), private.exportKey('PEM')
-print("Generated Keys ")
+
 mode = "Emulab"
 
-# NameSchedulerURI = config().GetAddress('NameScheduler')
-# communication.UpdateNodeDetails("ws://" + NameSchedulerURI + ":8765")
 
 # def Primary(ConnectedClients):
 # 	for Client in ConnectedClients.values():
@@ -59,28 +57,46 @@ def GetIp():
 			+ ["no IP found"]
 		   )[0]
 
-
 IpAddr = GetIp()
 config().UpdateAddress('client', IpAddr)
 
+# NameSchedulerURI = config().GetAddress('NameScheduler')
+# communication.UpdateNodeDetails("ws://" + NameSchedulerURI + ":8765")
 
-def Allocate(size):
+
+def NumberOfAllocated(ConnectedClients):
+	count = 0
+	for key, value in ConnectedClients.items():
+		if value['allocate']:
+			count += 1
+
+	return count
+
+def Allocate(size, nodes_info):
 	print(f"Received Allocate request for {size} nodes")
 	for i in range(size):
-		communication.SendMsg(ConnectedClients[str(i)]['Uri'], {'type': "Allocate"})
+		t1 = threading.Thread(target=communication.SendMsg, args=(ConnectedClients[str(i)]['Uri'], {'type': "Allocate", 'total': size}))
+		t1.start()
+		ConnectedClients[str(i)]['allocate'] = True
+		# communication.SendMsg(ConnectedClients[str(i)]['Uri'], {'type': "Allocate"})
 		socketio.emit('allocated', {'total': str(i+1)})
-		socketio.emit('status', {'id': i, 'status': 'allocated'})
+	nodes_info['allocated'] = NumberOfAllocated(ConnectedClients)
+	return nodes_info
+		# socketio.emit('allocated', {'total': str(i+1)})
+		# socketio.emit('status', {'id': i, 'status': 'allocated'})
 		# time.sleep(0.2)
 
 def DeAllocate(size, nodes_info):
 	print(f"Received DeAllocate request for {size} nodes")
 	for i in range(size):
-		communication.SendMsg(ConnectedClients[str(nodes_info['allocated'] - i - 1)]['Uri'], {'type': "DeAllocate"})
+		t1 = threading.Thread(target=communication.SendMsg, args=(ConnectedClients[str(nodes_info['allocated']-i-1)]['Uri'], {'type': "DeAllocate", 'total': nodes_info['allocated']-size }))
+		t1.start()
+		ConnectedClients[str(nodes_info['allocated']-i-1)]['allocate'] = False
+		# communication.SendMsg(ConnectedClients[str(nodes_info['allocated'] - i - 1)]['Uri'], {'type': "DeAllocate"})
 		socketio.emit('allocated', {'total': str(nodes_info['allocated'] - i -1)})
-		socketio.emit('status', {'id': str(nodes_info['allocated'] - i - 1), 'status': 'deallocated'})
-	nodes_info['allocated'] -= size
-
-
+		socketio.emit('status', {'id': str(nodes_info['allocated'] - i -1), 'status': 'allocated'})
+		# nodes_info['allocated'] -= 1
+	nodes_info['allocated'] = NumberOfAllocated(ConnectedClients)
 
 
 
@@ -88,16 +104,10 @@ def DeAllocate(size, nodes_info):
 def index():
 	return render_template('index.html', nodes_info=nodes_info)
     
-	# if request.method == 'GET':
-	# 	return render_template('home.html')
-	# if request.method == 'POST':
 
-	# 	print(request.form.get('nodes'))
-	# 	return render_template('index.html')
 
 @app.route('/request_client', methods=['POST'])
 def interactive():
-	# data = request.values
 	data = request.json
 	num1 = data['n1']
 	num2 = data['n2']
@@ -105,8 +115,8 @@ def interactive():
 
 	# Primary = ConnectedClients[0]
 	# primary = Primary(ConnectedClients)
-	# print(ConnectedClients)
-	primary = ConnectedClients[str(view)]['Uri']
+	print(ConnectedClients)
+	primary = ConnectedClients[str(view % nodes_info['allocated'])]['Uri']
 	# print(ConnectedClients)
 	print(primary)
 	# socketio.emit
@@ -114,9 +124,9 @@ def interactive():
 	message = {"o": oper,"args": {"num1": num1, "num2": num2}, "t": int(time.time()), "c": 1234567}
 	message = messaging.jwt(json=message, header={"alg": "RSA"}, key=private)
 	message = message.get_token()
-	print("sending message")
-	communication.SendMsg(primary, json.dumps({'token': message, 'type': 'Request'}))
-	print("message sent")
+	t1 = threading.Thread(target=communication.SendMsg, args=(primary, json.dumps({'token': message, 'type': 'Request'})))
+	t1.start()
+	# communication.SendMsg(primary, json.dumps({'token': message, 'type': 'Request'}))
 	# reply = await SendMsg(primary['Uri'], message)
 	# return render_template('interactive.html')
 	# return render_template('index.html', num_nodes=len(ConnectedClients))
@@ -142,9 +152,8 @@ def on_allocate(data):
 	global nodes_info, n
 	print(data, n)
 	if mode == "Emulab":
-		Allocate(min(int(data['nodes']), nodes_info['available']))
-		nodes_info['allocated'] = min(int(data['nodes']), nodes_info['available'])
-		n = min(int(data['nodes']), nodes_info['available'])
+		nodes_info = Allocate(min(int(data['nodes']), nodes_info['available']), nodes_info)
+		n = nodes_info['allocated']
 	print(nodes_info, data)
 
 
@@ -158,6 +167,8 @@ def on_deallocate(data):
 		n -= min(int(data['nodes']), nodes_info['allocated'])
 	print(nodes_info, data)
 
+
+
 @socketio.on('client')
 def on_connect(data):
 	print('connect initialized')
@@ -166,10 +177,16 @@ def on_connect(data):
 	nodes_info['available'] = len(ConnectedClients)
 	# primary = ConnectedClients[0]
 	IpAddr = GetIp()
+	print(IpAddr)
 	message = {'type': 'Client', 'client_id': 1234567890, 'public_key': public.decode('utf-8'), 'Uri': 'http://'+IpAddr+':'+str(port) }
 	socketio.emit('clients', {'number': data['total_clients']})
+	print("Socket Emitted")
 	# time.sleep(1)
-	communication.SendMsg(data['clients_info']['Uri'], message)
+	print("Sending msg")
+	t1 = threading.Thread(target=communication.SendMsg, args=(data['clients_info']['Uri'], message))
+	t1.start()
+	# communication.SendMsg(data['clients_info']['Uri'], message)
+	print("Sent msg")
 	# socketio.emit('log', {'no_clients': len(ConnectedClients), 'recv_client_info': ConnectedClients})
 
 @socketio.on('check_clients')
@@ -180,6 +197,7 @@ def on_log(data):
 
 @socketio.on('reply')
 def on_reply(data):
+	global reply
 	print(data)
 	jwt = messaging.jwt()
 	token = jwt.get_payload(data['token'])
@@ -188,13 +206,15 @@ def on_reply(data):
 		if token['r'] == reply[token['t']]['r']:
 			reply[token['t']]['count'] += 1
 	else:
-		reply[token['t']] = {'r': token['r'], 'count': 0}
+		reply[token['t']] = {'r': token['r'], 'count': 0, 'view': token['v']}
 
 	print(f"Count = {reply[token['t']]['count']}")
 	if reply[token['t']]['count'] >= (len(ConnectedClients)//3) + 1:
+		view = reply[token['t']]['view']
 		print("Socket emiting")
 		socketio.emit('Reply', {'reply': reply[token['t']]['r'] })
 		print("Socket emited")
+
 
 @socketio.on('status')
 def on_status(data):
@@ -203,5 +223,26 @@ def on_status(data):
 	socketio.emit('status', data)
 
 
+
+# @socketio.on('view-change')
+# def on_view_change(data):
+# 	global view_change, view
+# 	jwt = messaging.jwt()
+# 	payload = jwt.get_payload(data)
+
+# 	#verify
+# 	if True: #change to verification
+# 		view_in_consideration = int(payload['v'])
+# 		if view_in_consideration not in view_change:
+# 			view_change[view_in_consideration] = 1
+# 		else:
+# 			view_change[view_in_consideration] += 1
+# 			if view_change[view_in_consideration] >= (len(ConnectedClients)//3) + 1:
+# 				view = int(view_in_consideration)
+# 				print("BEWARE! CLIENT GOING INTO VIEW", view)				
+# 				view_change = {}
+
+
 if __name__ == '__main__':
     socketio.run(app, '0.0.0.0', port, debug=True)
+

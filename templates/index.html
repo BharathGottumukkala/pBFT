@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>SB Admin 2 - Dashboard</title>
+  <title>pBFT Demo</title>
 
   <!-- Custom fonts for this template-->
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -171,7 +171,7 @@
           </button>
 
           <!-- Topbar Search -->
-          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+          <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
             <div class="input-group">
               <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
               <div class="input-group-append">
@@ -180,17 +180,15 @@
                 </button>
               </div>
             </div>
-          </form>
+          </form> -->
 
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
 
-            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-            <li class="nav-item dropdown no-arrow d-sm-none">
+            <!-- <li class="nav-item dropdown no-arrow d-sm-none">
               <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-search fa-fw"></i>
               </a>
-              <!-- Dropdown - Messages -->
               <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
                 <form class="form-inline mr-auto w-100 navbar-search">
                   <div class="input-group">
@@ -203,16 +201,14 @@
                   </div>
                 </form>
               </div>
-            </li>
+            </li> -->
 
             <!-- Nav Item - Alerts -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <!-- <li class="nav-item dropdown no-arrow mx-1">
               <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-bell fa-fw"></i>
-                <!-- Counter - Alerts -->
                 <span class="badge badge-danger badge-counter">3+</span>
               </a>
-              <!-- Dropdown - Alerts -->
               <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
                 <h6 class="dropdown-header">
                   Alerts Center
@@ -252,16 +248,14 @@
                 </a>
                 <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
               </div>
-            </li>
+            </li> -->
 
             <!-- Nav Item - Messages -->
-            <li class="nav-item dropdown no-arrow mx-1">
+            <!-- <li class="nav-item dropdown no-arrow mx-1">
               <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-envelope fa-fw"></i>
-                <!-- Counter - Messages -->
                 <span class="badge badge-danger badge-counter">7</span>
               </a>
-              <!-- Dropdown - Messages -->
               <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
                 <h6 class="dropdown-header">
                   Message Center
@@ -308,17 +302,16 @@
                 </a>
                 <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
               </div>
-            </li>
+            </li> -->
 
             <div class="topbar-divider d-none d-sm-block"></div>
 
             <!-- Nav Item - User Information -->
-            <li class="nav-item dropdown no-arrow">
+            <!-- <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">Valerie Luna</span>
                 <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
               </a>
-              <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                 <a class="dropdown-item" href="#">
                   <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -338,7 +331,7 @@
                   Logout
                 </a>
               </div>
-            </li>
+            </li> -->
 
           </ul>
 
@@ -349,10 +342,10 @@
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+          <!-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
             <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-          </div>
+          </div> -->
 
           <!-- Content Row -->
           <div class="row">
@@ -363,8 +356,8 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Available Nodes</div>
-                      <div id="nodes" class="h5 mb-0 font-weight-bold text-gray-800">{{ nodes_info["available"] }}</div>
+                      <div style="font-size: 120%" class="text-xs font-weight-bold text-primary text-uppercase mb-1">Available Nodes</div>
+                      <div id="nodes" style="font-size: 150%" class="h5 mb-0 font-weight-bold text-gray-800">{{ nodes_info["available"] }}</div>
 
                     </div>
                     <div class="col-auto">
@@ -381,8 +374,8 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Allocated Nodes</div>
-                      <div id="alloc_nodes" class="h5 mb-0 font-weight-bold text-gray-800">{{ nodes_info["allocated"] }}</div>
+                      <div style="font-size: 120%" class="text-xs font-weight-bold text-success text-uppercase mb-1">Allocated Nodes</div>
+                      <div id="alloc_nodes" style="font-size: 150%" class="h5 mb-0 font-weight-bold text-gray-800">{{ nodes_info["allocated"] }}</div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -398,7 +391,7 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks</div>
+                      <div style="font-size: 120%" class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks</div>
                       <div class="row no-gutters align-items-center">
                         <div class="col-auto">
                           <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
@@ -424,7 +417,7 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Faulty Nodes</div>
+                      <div style="font-size: 120%" class="text-xs font-weight-bold text-warning text-uppercase mb-1">Faulty Nodes</div>
                       <div class="h5 mb-0 font-weight-bold text-gray-800">{{ nodes_info["faulty"] }}</div>
                     </div>
                     <div class="col-auto">
@@ -473,7 +466,7 @@
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Add Two Numbers</h6>
+                  <h6 style="font-size: 120%" class="m-0 font-weight-bold text-primary">Add Two Numbers</h6>
                   
                   <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -522,7 +515,7 @@
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Allocate Nodes</h6>
+                  <h6 style="font-size: 120%" class="m-0 font-weight-bold text-primary">Allocate Nodes</h6>
                   
                   <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -553,7 +546,7 @@
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Deallocate Nodes</h6>
+                  <h6 style="font-size: 120%;" class="m-0 font-weight-bold text-primary">Deallocate Nodes</h6>
                   
                   <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -573,7 +566,7 @@
                   <div>
                     <form  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
 
-                      <input type="text" placeholder="Number of nodes to deallocate" class="form-control bg-light border-0 small" id="deallocate" name="result"><br><br>
+                      <input type="text" style="font-size: 100%" placeholder="Number of nodes to deallocate" class="form-control bg-light border-0 small" id="deallocate" name="result"><br><br>
                       <input type="button" class="btn btn-danger" id="btndealloc" value="Submit"><br>
                     </form>
                   </div>
@@ -595,96 +588,121 @@
                   <h6 class="m-0 font-weight-bold text-primary">Status of Allocated Nodes</h6>
                 </div>
                 <div class="card-body">
-                  <h4 id="0_text" class="small font-weight-bold">Node Id 0 <span class="float-right">20%</span></h4>
+                  <h4 id="0_text" style="font-size: 110%" class="small font-weight-bold">Node Id 0 <span id="0_view" class="float-right">20%</span></h4>
                   <div id="0_bar" class="progress mb-4">
                     <div class="progress-bar bg-success" id="0_progress" role="progressbar" style="width: 0%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="1_text" class="small font-weight-bold">Node Id 1 <span class="float-right">40%</span></h4>
+                  <h4 id="1_text" style="font-size: 110%" class="small font-weight-bold">Node Id 1 <span id="1_view" class="float-right">40%</span></h4>
                   <div id="1_bar" class="progress mb-4">
                     <div  id="1_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="2_text" class="small font-weight-bold">Node Id 2 <span class="float-right">40%</span></h4>
+                  <h4 id="2_text" style="font-size: 110%" class="small font-weight-bold">Node Id 2 <span id="2_view" class="float-right">40%</span></h4>
                   <div id="2_bar" class="progress mb-4">
                     <div  id="2_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="3_text" class="small font-weight-bold">Node Id 3 <span class="float-right">40%</span></h4>
+                  <h4 id="3_text" style="font-size: 110%" class="small font-weight-bold">Node Id 3 <span id="3_view" class="float-right">40%</span></h4>
                   <div id="3_bar" class="progress mb-4">
                     <div  id="3_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="4_text" class="small font-weight-bold">Node Id 4 <span class="float-right">40%</span></h4>
+                  <h4 id="4_text" style="font-size: 110%" class="small font-weight-bold">Node Id 4 <span id="4_view" class="float-right">40%</span></h4>
                   <div id="4_bar" class="progress mb-4">
                     <div  id="4_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="5_text" class="small font-weight-bold">Node Id 5 <span class="float-right">40%</span></h4>
+                  <h4 id="5_text" style="font-size: 110%" class="small font-weight-bold">Node Id 5 <span id="5_view" class="float-right">40%</span></h4>
                   <div id="5_bar" class="progress mb-4">
                     <div  id="5_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="6_text" class="small font-weight-bold">Node Id 6 <span class="float-right">40%</span></h4>
+                  <h4 id="6_text" style="font-size: 110%" class="small font-weight-bold">Node Id 6 <span id="6_view" class="float-right">40%</span></h4>
                   <div id="6_bar" class="progress mb-4">
                     <div  id="6_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="7_text" class="small font-weight-bold">Node Id 7 <span class="float-right">40%</span></h4>
+                  <h4 id="7_text" style="font-size: 110%" class="small font-weight-bold">Node Id 7 <span id="7_view" class="float-right">40%</span></h4>
                   <div id="7_bar" class="progress mb-4">
                     <div  id="7_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="8_text" class="small font-weight-bold">Node Id 8 <span class="float-right">40%</span></h4>
+                  <h4 id="8_text" style="font-size: 110%" class="small font-weight-bold">Node Id 8 <span id="8_view" class="float-right">40%</span></h4>
                   <div id="8_bar" class="progress mb-4">
                     <div  id="8_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="9_text" class="small font-weight-bold">Node Id 9 <span class="float-right">40%</span></h4>
+                  <h4 id="9_text" style="font-size: 110%" class="small font-weight-bold">Node Id 9 <span id="9_view" class="float-right">40%</span></h4>
                   <div id="9_bar" class="progress mb-4">
                     <div  id="9_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="10_text" class="small font-weight-bold">Node Id 10 <span class="float-right">40%</span></h4>
+                  <h4 id="10_text" style="font-size: 110%" class="small font-weight-bold">Node Id 10 <span id="10_view" class="float-right">40%</span></h4>
                   <div id="10_bar" class="progress mb-4">
                     <div  id="10_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="11_text" class="small font-weight-bold">Node Id 11 <span class="float-right">40%</span></h4>
+                  <h4 id="11_text" style="font-size: 110%" class="small font-weight-bold">Node Id 11 <span id="11_view" class="float-right">40%</span></h4>
                   <div id="11_bar" class="progress mb-4">
                     <div  id="11_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="12_text" class="small font-weight-bold">Node Id 12 <span class="float-right">40%</span></h4>
+                  <h4 id="12_text" style="font-size: 110%" class="small font-weight-bold">Node Id 12 <span id="12_view" class="float-right">40%</span></h4>
                   <div id="12_bar" class="progress mb-4">
                     <div  id="12_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="13_text" class="small font-weight-bold">Node Id 13 <span class="float-right">40%</span></h4>
+                  <h4 id="13_text" style="font-size: 110%" class="small font-weight-bold">Node Id 13 <span id="13_view" class="float-right">40%</span></h4>
                   <div id="13_bar" class="progress mb-4">
                     <div  id="13_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="14_text" class="small font-weight-bold">Node Id 14 <span class="float-right">40%</span></h4>
+                  <h4 id="14_text" style="font-size: 110%" class="small font-weight-bold">Node Id 14 <span id="14_view" class="float-right">40%</span></h4>
                   <div id="14_bar" class="progress mb-4">
                     <div  id="14_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="15_text" class="small font-weight-bold">Node Id 15 <span class="float-right">40%</span></h4>
+                  <h4 id="15_text" style="font-size: 110%" class="small font-weight-bold">Node Id 15 <span id="15_view" class="float-right">40%</span></h4>
                   <div id="15_bar" class="progress mb-4">
                     <div  id="15_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="16_text" class="small font-weight-bold">Node Id 16 <span class="float-right">40%</span></h4>
+                  <h4 id="16_text" style="font-size: 110%" class="small font-weight-bold">Node Id 16 <span id="16_view" class="float-right">40%</span></h4>
                   <div id="16_bar" class="progress mb-4">
                     <div  id="16_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="17_text" class="small font-weight-bold">Node Id 17 <span class="float-right">40%</span></h4>
+                  <h4 id="17_text" style="font-size: 110%" class="small font-weight-bold">Node Id 17 <span id="17_view" class="float-right">40%</span></h4>
                   <div id="17_bar" class="progress mb-4">
                     <div  id="17_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="18_text" class="small font-weight-bold">Node Id 18 <span class="float-right">40%</span></h4>
+                  <h4 id="18_text" style="font-size: 110%" class="small font-weight-bold">Node Id 18 <span id="18_view" class="float-right">40%</span></h4>
                   <div id="18_bar" class="progress mb-4">
                     <div  id="18_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
                 </div>
               </div>
 
+              
+
+            </div>
+
+
+            <div class="col-lg-6 mb-4">
               <!-- Color System -->
               <div class="row">
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-primary text-white shadow">
+                <div class="col-lg-2 mb-6">
+                  <div id="0_card" class="card bg-success text-center shadow">
                     <div class="card-body">
-                      Primary
-                      <div class="text-white-50 small">#4e73df</div>
+                      <div class="dropdown no-arrow">
+                    <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="0_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
+                      Node Id 0
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                      <div class="dropdown-header">Types of Faults:</div>
+                      <a id="0_reboot" class="dropdown-item" href="#">Reboot</a>
+                      <a id="0_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                      <a id="0_malicious" class="dropdown-item" href="#">Malicious
+                        <form>
+                          <input type="text" id="0_malicious_data">
+                        </form>
+                      </a>
+                      <!-- <div class="dropdown-divider"></div> -->
+                      <div class="dropdown-header">Remove all faults?:</div>
+                      <a id="0_benign" class="dropdown-item" href="#">Benign</a>
+                      <a id="0_benign" class="dropdown-item" href="#">Node State</a>
+                      
+                    </div>
+                  </div>
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-6 mb-4">
+                <div class="col-lg-2 mb-4">
                   <div class="card bg-success text-white shadow">
                     <div class="card-body">
                       Success
@@ -692,7 +710,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-6 mb-4">
+                <div class="col-lg-2 mb-4">
                   <div class="card bg-info text-white shadow">
                     <div class="card-body">
                       Info
@@ -726,36 +744,6 @@
                 </div>
               </div>
 
-            </div>
-
-            <div class="col-lg-6 mb-4">
-
-              <!-- Illustrations -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Illustrations</h6>
-                </div>
-                <div class="card-body">
-                  <div class="text-center">
-                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;" src="img/undraw_posting_photo.svg" alt="">
-                  </div>
-                  <p>Add some quality, svg illustrations to your project courtesy of <a target="_blank" rel="nofollow" href="https://undraw.co/">unDraw</a>, a constantly updated collection of beautiful svg images that you can use completely free and without attribution!</p>
-                  <a target="_blank" rel="nofollow" href="https://undraw.co/">Browse Illustrations on unDraw &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Approach -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Development Approach</h6>
-                </div>
-                <div class="card-body">
-                  <p>SB Admin 2 makes extensive use of Bootstrap 4 utility classes in order to reduce CSS bloat and poor page performance. Custom CSS classes are used to create custom components and custom utility classes.</p>
-                  <p class="mb-0">Before working with this theme, you should become familiar with the Bootstrap framework, especially the utility classes.</p>
-                </div>
-              </div>
-
-            </div>
           </div>
 
         </div>
@@ -851,6 +839,41 @@
       });
     });
 
+    $('#0_malicious').click(function (e) {
+      console.log("Clicked nodes");
+      $('#0_card').removeClass('bg-success');
+      $('#0_card').removeClass('bg-warning');
+      $('#0_card').addClass('bg-danger');
+      // $('#0_malicious_data').hide()
+
+
+    });
+
+    $('#0_netdelay').click(function (e) {
+      console.log("Clicked nodes");
+      $('#0_card').removeClass('bg-success');
+      $('#0_card').removeClass('bg-warning');
+      $('#0_card').addClass('bg-danger');
+
+    });
+
+    $('#0_reboot').click(function (e) {
+      console.log("Clicked nodes");
+      $('#0_card').removeClass('bg-success');
+      $('#0_card').removeClass('bg-danger');
+      $('#0_card').addClass('bg-warning');
+
+    });
+    $('#0_benign').click(function (e) {
+      console.log("Clicked nodes");
+      $('#0_card').removeClass('bg-warning');
+      $('#0_card').removeClass('bg-danger');
+      $('#0_card').addClass('bg-success');
+
+    });
+
+
+
 
   $(document).ready(function(){
       //connect to the socket server.
@@ -882,6 +905,18 @@
           $('#' + msg['id'].toString() + '_text').show();
           $('#' + msg['id'].toString() + '_bar').show();
           $('#' + msg['id'].toString() + '_progress').show(); 
+          // var text = $('#' + msg['id'].toString() + '_text').text()
+          $('#' + msg['id'].toString() + '_view').text('\t\tView = ' + msg['view']);
+
+        }
+        else if (msg['status'] == 'view_change'){
+          $('#' + msg['id'].toString() + '_view').text('\t\tView = ' + msg['view']);
+          $('#' + msg['id'].toString() + '_view').css({ 'color': 'green', 'font-size': '120%' });
+          var refreshId = setInterval( function() 
+          {
+            $('#' + msg['id'].toString() + '_view').css({ 'color': 'grey' ,'font-weight': '700', 'font-size': '100%' });
+          }, 1000);
+          
         }
         else if (msg['status'] == 'deallocated'){
           $('#' + msg['id'].toString() + '_text').hide();

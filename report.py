@@ -9,16 +9,18 @@ So in order to report we have to send a msg using socketio Client
 import socketio
 import time
 
+
 def Report(server, handle, message):
 	try:
 		sio = socketio.Client()
 		sio.connect(server)
-		print('my sid is', sio.sid)
+		# print('my sid is', sio.sid)
 		sio.emit(handle, message)
 		time.sleep(0.5)
 		sio.disconnect()
+		del sio
 	except Exception as e:
-		print(f'Trying to update client again and the error is {e}')
+		print(e)
 		time.sleep(0.5)
 		Report(server, handle, message)
 	

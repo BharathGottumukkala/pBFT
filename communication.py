@@ -6,10 +6,22 @@ import asyncio
 import websockets
 import json
 import time
+
 from netifaces import interfaces, ifaddresses, AF_INET
 
 import report
 from config import config
+
+
+def GetLocalIp():
+	for ifaceName in interfaces():
+		addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+		f = addresses[0].split('.')
+		if f[0] == '10':
+			return addresses[0]
+		elif f[0] == '192':
+			return addresses[0]
+
 
 def UpdateNodeDetails(NameSchedulerURI):
 	# Check If NameScheduler is online
@@ -31,31 +43,26 @@ def UpdateNodeDetails(NameSchedulerURI):
 
 
 
-def GetLocalIp():
-	for ifaceName in interfaces():
-		addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-		f = addresses[0].split('.')
-		if f[0] == '10':
-			return addresses[0]
-		elif f[0] == '192':
-			return addresses[0]
-
 
 async def SendMsgRoutine(uri, message):
 	# Asyncronous send used by websockets
 	try:
 		# Connect to node's Uri and send anything
 		async with websockets.connect(uri) as websocket:
+			# print(f"Connected to {uri}")
 			# We can only send a string
 			if isinstance(message, dict):
 				message = json.dumps(message)
 			else:
 				message = str(message)
+			# print("sending msg")
 			await websocket.send(message)
+			# print("sent message")
 	except Exception as e:
+		# pass
 		print("Error:{}".format(e))
 		print('Retrying...')
-		time.sleep(1)
+		time.sleep(0.5)
 		await SendMsgRoutine(uri, message)
 
 
@@ -63,9 +70,15 @@ def SendMsg(uri, message):
 	# Used by synchronous servers ike flask to send "sort of" async msgs I guess
 	# Mainly for flask to send msgs to websocket servers
 	loop = asyncio.new_event_loop()
+	# print("Loop created")
 	asyncio.set_event_loop(loop)
-	future = asyncio.ensure_future(SendMsgRoutine(uri, message)) # tasks to do
+	# print("set set_event_loop")
+	# loop.create_task(SendMsgRoutine(uri, message))
+	future = asyncio.ensure_future(SendMsgRoutine(uri, message))
+	# print("after future command") # tasks to do
 	loop.run_until_complete(future)
+	# print("After loop.run()")
+	del loop
 
 
 async def BroadCast(SenderIp, SenderPort, ListOfClients, Msg):
@@ -114,16 +127,12 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 	mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
 	sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 	while True:
-		data = sock.recv(10240)
+		data = sock.recv(50240)
 		# print(data)
 		data = json.loads(data)
 
 		# if data['type'] == 'Allocate':
-		# 	print(f"Received Allocate request -> {node.NodeId}")
 		# 	node.ListOfNodes[node.NodeId]['allocate'] = True
-		# 	m = {'id': node.NodeId, 'status': 'allocated'}
-		# 	server = config().GetAddress('client')
-		# 	report.Report(server, 'status_rep', m)
 
 		if data['type'] == 'NewNode':
 			SendMsg(node.Uri, data)
@@ -132,14 +141,11 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 		if node.NodeId != -1:
 			if node.ListOfNodes[node.NodeId]['allocate']:
 				SendMsg(node.Uri, data)
-
-		# if data['type'] == 'DeAllocate':
-		# 	node.ListOfNodes[node.NodeId]['allocate'] = False
 			
 
 if __name__ == '__main__':
 	# Multicast('224.1.1.1', 8766)
-	message = {'type': 'Test', 'num1': 1, 'num2': 2}
-	SendMsg("ws://192.168.0.104:7052", message)
+	message = {'type': 'Request', 'num1': 1, 'num2': 2}
+	SendMsg("ws://192.168.0.113:7086", message)
 	# await SendMsg('ws://localhost:8765', message)
 

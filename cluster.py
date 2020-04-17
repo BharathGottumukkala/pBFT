@@ -72,12 +72,7 @@ def Cluster(size):
 		port = random.randint(7000, 7500)
 		p = StartNode(port)
 		processes.append(p)
-		time.sleep(1)
-
-	for p in processes:
-		print("DAMN")
-		p.join()
-		print("IT")
+		time.sleep(2)
 
 
 if __name__ == '__main__':

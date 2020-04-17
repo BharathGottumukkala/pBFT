@@ -19,7 +19,7 @@ def Request(message, public_key, view, n, private_key):
 	final = None
 	if verify:
 		# If verified, create a new message to forward to other nodes
-		pre_prepare = {"v": view,"n": 100, "d": digest(message)}
+		pre_prepare = {"v": view,"n": n, "d": digest(message)}
 		pre_prepare = json.dumps(pre_prepare)
 		pre_prepare = json.loads(pre_prepare)
 		# Sign the meessage to generate the token using your privte_key
@@ -88,15 +88,14 @@ def CreateCommit(message, NodeId, private_key_self):
 
 def CreateReply(message, clog, NodeId, private_key_self):
 	jwt = messaging.jwt()
-	token = jwt.get_payload(message['token'])
-	for log in clog:
-		if token['d'] == log['d']:
-			cur_log = log
-
-	reply = {'v': token['v'], 't': cur_log['m']['t'], 'c': cur_log['m']['c'], 'i': NodeId}
-	op = cur_log['m']['o']
+	payload = jwt.get_payload(message['token'])
+	cur_log = clog.log[payload['d']]
+	original_message = jwt.get_payload(cur_log['m'])
+	
+	reply = {'v': payload['v'], 't': original_message['t'], 'c': original_message['c'], 'i': NodeId}
+	op = original_message['o']
 	if op == 'add':
-		result = int(cur_log['m']['args']['num1']) + int(cur_log['m']['args']['num2'])
+		result = int(original_message['args']['num1']) + int(original_message['args']['num2'])
 		result = str(result) 
 
 	reply['r'] = result
@@ -106,4 +105,99 @@ def CreateReply(message, clog, NodeId, private_key_self):
 	return reply
 
 
+def CreateCheckpointMessage(my_id, message_log, private_key):
+	# # # get n and d of the last message executed
+	n = -1
+	d = ''
+	for digest in message_log.log:
+		if message_log.log[digest]['n'] > n:
+			n = message_log.log[digest]['n']
+			d = digest
+	# # # create the message to send
+	message = {'d': d, 'n': n, 'i':my_id}
+	token = messaging.jwt(json=message, header={"alg": "RSA"}, key=private_key)
+	token = token.get_token()
+	message = {'type': 'CHECKPOINT', 'token': token}
+	return message
 
+def VerifyCheckpoint(message, node_list):
+	# # # Get the id of the node correspoding to the message so we can retrieve the pubkey
+	jwt = messaging.jwt()
+	payload = jwt.get_payload(message['token'])
+	node_id = payload['i']
+	pubkey = node_list[node_id]['public_key']
+	
+	# Verify 
+	return jwt.verify(pubkey, message['token']) 
+
+def CreateViewChangeMessage(checkpoint_log, message_log, v, i, private_key):
+	'''
+	<”VIEW-CHANGE”, v+1, n, C, P, i)signed by
+	'''
+	# # # checkpoinging
+	C = checkpoint_log.log
+	jwt = messaging.jwt()
+	n = max([-1] + [jwt.get_payload(C[i])['n'] for i in C])
+	# print("View change", i, v, n)
+	# print(C)
+
+	# # # message log
+	m = message_log.log
+	P = {}
+	'''
+	P = {
+		digest: {
+			preprepare: ''
+			prepare: {
+				id: ''
+			}
+		}
+	}
+	'''
+	for d in m:
+		P[d] = {}
+		P[d]['preprepare'] = m[d]['preprepare']
+		P[d]['prepare'] = m[d]['prepare']
+	# print(P)
+
+	view_change_message = {'v': v+1, 'n': n, 'C': C, 'P': P, 'i': i}
+	token = messaging.jwt(json=view_change_message, header={
+	                      "alg": "RSA"}, key=private_key)
+	token = token.get_token()
+	message = {'type': 'VIEW-CHANGE', 'token': token}
+	return message
+
+
+def VerifyViewChange(message, node_list):
+	jwt = messaging.jwt()
+	payload = jwt.get_payload(message['token'])
+	node_id = payload['i']
+	pubkey = node_list[node_id]['public_key']
+
+	return jwt.verify(pubkey, message['token'])
+
+def CreateNewViewMessage(view, change_view_log, private_key):
+	# jwt = messaging.jwt()
+	# payload = jwt.get_payload(message['token'])
+	new_view_message = {"v": view, "V":change_view_log.log}
+	token = messaging.jwt(json=new_view_message, header={
+	                      "alg": "RSA"}, key=private_key)
+	token = token.get_token()
+	message = {'type': 'NEW-VIEW', 'token': token}
+	return message
+
+
+def VerifyNewView(message, list_of_nodes, primary_id):
+	jwt = messaging.jwt()
+	# # # check new primary sign is correct
+	primary_pubkey = list_of_nodes[str(primary_id)]['public_key']
+	if not jwt.verify(primary_pubkey, message['token']):
+		return False
+	
+	# # # check rest of the signs
+	payload = jwt.get_payload(message['token'])['V']
+	for node_id in payload:
+		if not jwt.verify(list_of_nodes[str(node_id)]['public_key'], payload[node_id]):
+			print(f"{node_id} didn't verify so everything is not ruined!")
+			return False
+	return True

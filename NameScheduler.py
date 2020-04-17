@@ -6,12 +6,19 @@ import json
 import threading
 import socket
 import struct
+from utils import boolean
 
+#for quicker testing
+import argparse
+parser = argparse.ArgumentParser(description='To get same results without a lot of effort.')
+parser.add_argument('--OPTIMIZE', type=boolean, help='Do NOT use this for the final result', default=False)
+args = parser.parse_args()
 
 from communication import *
 from report import Report
 import sign
 from config import config
+
 
 class NameScheduler(object):
 	"""docstring for NameScheduler"""
@@ -21,6 +28,7 @@ class NameScheduler(object):
 		self.ListOfIds = [str(i) for i in range(self.MaxNodes)]
 		self.ConnectedClients = {}
 		config().UpdateAddress('NameScheduler', GetLocalIp())
+
 		# self.Uri = 'ws://localhost:8765'
 		self.node = Node.Node(8765)
 		self.node.NodeId = -1
@@ -34,13 +42,17 @@ class NameScheduler(object):
 										'public_key': public_key,
 										'private_key': private_key} 
 
-
-
 	def generateId(self, IpAddr, port, uri, allocate):
 		# id_ = random.choice(self.ListOfIds)
 		id_ = self.ListOfIds[0]
-		pub, priv = sign.GenerateKeys(2048)
-		pub, priv = pub.exportKey('PEM').decode('utf-8'), priv.exportKey('PEM').decode('utf-8')
+		if args.OPTIMIZE:
+			import pickle
+			print("Unpickling keys for id:", id_)
+			pub = pickle.load(open("keys/pub{}.pickle".format(id_), 'rb'))
+			priv = pickle.load(open("keys/priv{}.pickle".format(id_), 'rb'))
+		else:
+			pub, priv = sign.GenerateKeys(2048)
+			pub, priv = pub.exportKey('PEM').decode('utf-8'), priv.exportKey('PEM').decode('utf-8')
 		self.ListOfIds.remove(id_)
 		self.register(id_, IpAddr, port, uri, allocate, pub, priv)
 		return id_, pub
@@ -54,7 +66,7 @@ class NameScheduler(object):
 
 	async def IdRoutine(self, websocket, path):
 		async for message in websocket:
-			# server = 'http://155.98.38.44:4003/'
+			# server = 'http://0.0.0.0:4003/'
 			server = 'http://' + config().GetAddress('client') + ":4003/"
 			message = json.loads(message)
 			if message['type'].upper() == 'HANDSHAKE':
@@ -93,7 +105,7 @@ class NameScheduler(object):
 
 					
 					m = {'total_clients': len(self.ConnectedClients), 'id': client_id, 'clients_info': self.ConnectedClients[client_id]}
-					print(m)
+					# print(m)
 					Report(server, 'client', m)
 
 					# if len(self.ConnectedClients) > 2:
@@ -101,26 +113,20 @@ class NameScheduler(object):
 					# await self.BroadCastNewNode(message, msg)
 					# await BroadCast(message['IpAddr'], message['port'], self.ConnectedClients, msg)
 					Multicast('224.1.1.1', 8766, msg)
-
-			elif message['type'] == "UpdateDetails":
-				print(self.ConnectedClients)
-				for i in range(10, 0, -1):
-					print(f"Updating Client in {i}")
-					time.sleep(1)
-				for key, value in self.ConnectedClients.items():
-					m = {'total_clients': int(key)+1, 'id': key, 'clients_info': value}
-					Report(server, 'client', m)
-
-
 					
+			if message['type'].upper() == 'UPDATEDETAILS':
+				if len(self.ConnectedClients):
+					print("Updating Details of Nodes")
+					for key, value in self.ConnectedClients.items():
+						m = {'total_clients': int(key)+1, 'id': key, 'clients_info': value}
+						Report(server, 'client', m)
 
 	def SocketServer(self):
 		MulticastServer('224.1.1.1', 8766, self.node)
 
 
 	def Id_websocket(self):
-		asyncio.get_event_loop().run_until_complete(
-		    websockets.serve(self.IdRoutine, port=8765, close_timeout=10000))
+		asyncio.get_event_loop().run_until_complete(websockets.serve(self.IdRoutine, port=8765, close_timeout=10000))
 		asyncio.get_event_loop().run_forever()
 
 	def Id(self):
