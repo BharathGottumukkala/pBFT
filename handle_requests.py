@@ -129,3 +129,75 @@ def VerifyCheckpoint(message, node_list):
 	
 	# Verify 
 	return jwt.verify(pubkey, message['token']) 
+
+def CreateViewChangeMessage(checkpoint_log, message_log, v, i, private_key):
+	'''
+	<”VIEW-CHANGE”, v+1, n, C, P, i)signed by
+	'''
+	# # # checkpoinging
+	C = checkpoint_log.log
+	jwt = messaging.jwt()
+	n = max([-1] + [jwt.get_payload(C[i])['n'] for i in C])
+	# print("View change", i, v, n)
+	# print(C)
+
+	# # # message log
+	m = message_log.log
+	P = {}
+	'''
+	P = {
+		digest: {
+			preprepare: ''
+			prepare: {
+				id: ''
+			}
+		}
+	}
+	'''
+	for d in m:
+		P[d] = {}
+		P[d]['preprepare'] = m[d]['preprepare']
+		P[d]['prepare'] = m[d]['prepare']
+	# print(P)
+
+	view_change_message = {'v': v+1, 'n': n, 'C': C, 'P': P, 'i': i}
+	token = messaging.jwt(json=view_change_message, header={
+	                      "alg": "RSA"}, key=private_key)
+	token = token.get_token()
+	message = {'type': 'VIEW-CHANGE', 'token': token}
+	return message
+
+
+def VerifyViewChange(message, node_list):
+	jwt = messaging.jwt()
+	payload = jwt.get_payload(message['token'])
+	node_id = payload['i']
+	pubkey = node_list[node_id]['public_key']
+
+	return jwt.verify(pubkey, message['token'])
+
+def CreateNewViewMessage(view, change_view_log, private_key):
+	# jwt = messaging.jwt()
+	# payload = jwt.get_payload(message['token'])
+	new_view_message = {"v": view, "V":change_view_log.log}
+	token = messaging.jwt(json=new_view_message, header={
+	                      "alg": "RSA"}, key=private_key)
+	token = token.get_token()
+	message = {'type': 'NEW-VIEW', 'token': token}
+	return message
+
+
+def VerifyNewView(message, list_of_nodes, primary_id):
+	# # # check new primary sign is correct
+	primary_pubkey = list_of_nodes[str(primary_id)]['public_key']
+	if not jwt.verify(primary_pubkey, message['token']):
+		return False
+	
+	# # # check rest of the signs
+	jwt = messaging.jwt()
+	payload = jwt.get_payload(message['token'])
+	for node_id in payload:
+		if not jwt.verify(list_of_nodes[str(node_id)]['public_key'], payload[node_id]):
+			print(f"{node_id} didn't verify so everything is not ruined!")
+			return False
+	return True

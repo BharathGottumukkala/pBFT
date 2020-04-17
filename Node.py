@@ -22,7 +22,6 @@ import handle_requests
 
 # Logging 
 import mlog
-
 # Report back to client for demo purposes
 import report
 
@@ -47,6 +46,7 @@ class Node(object):
 		self.count = 0
 		self.log = mlog.MessageLog()
 		self.ckpt_log = mlog.CheckLog()
+		self.view_change_log = mlog.ViewChangeLog()
 		"""
 		self.ListOfNodes = {'NodeID': {uska details}}
 		
@@ -80,7 +80,7 @@ class Node(object):
 
 
 	def IsPrimary(self):
-		return str(self.view) == str(self.NodeId)
+		return str(self.view % len(self.ListOfNodes)) == str(self.NodeId)
 
 
 	def ChangeMode(self, mode):
@@ -129,6 +129,10 @@ class Node(object):
 			# token is generated using messaging library in handle_requests
 			message = json.loads(message)
 			
+			# # # We enter 'View-Change' mode when some error is detected. So no messages except VIEW-CHANGE are accepted
+			if message['type'].upper() not in ['VIEW-CHANGE', 'NEW-VIEW'] and self.mode == 'View-Change':
+				return #dont do anything, there is something wrong with the distributed system!
+
 
 			# # # When a new node is added, Register the nde's details for future communication
 			if message['type'].upper() == 'NEWNODE':
@@ -260,20 +264,30 @@ class Node(object):
 					print(f"{self.NodeId} -> Sent a REPLY to the client!")
 					self.ChangeMode('Sleep')
 					
+					# if self.IsPrimary():
+					# 	print(f'LOG of {self.NodeId}')
+					# 	print('\n'*10)
+					# 	self.log.Print()
 					# # # CHECKPOINTING
-					if len(self.log.log) >= 1:
-						# if more than 2 messages in message log, flush it!
+					if len(self.log.log) >= 2:
+						# if more than 5 messages in message log, flush it!
 						checkpoint_message = handle_requests.CreateCheckpointMessage(self.NodeId, self.log, self.private_key)
 						communication.Multicast('224.1.1.1', 8766, checkpoint_message)
 						self.ChangeMode('Checkpoint')
 
+					# # # View change
+					if len(self.log.log) >= 1:
+						view_change_message = handle_requests.CreateViewChangeMessage(self.ckpt_log, self.log, self.view, self.NodeId, self.private_key)
+						# print(view_change_message)
+						communication.Multicast('224.1.1.1', 8766, view_change_message)
+						self.ChangeMode('View-Change')
+
+
+
 
 			elif message['type'].upper() == 'CHECKPOINT':
-				# if self.IsPrimary():
-				# 	print(f'LOG of {self.NodeId}')
-				# 	print('\n'*10)
-				# 	self.log.Print()
 				# # # only do all the checkpointing stuff if there is stuff in the message log to flush
+				
 				if not self.log.IsEmpty():
 					if handle_requests.VerifyCheckpoint(message, self.ListOfNodes):
 						print(f"{self.NodeId} -> Adding checkpoint to llog!")
@@ -281,11 +295,30 @@ class Node(object):
 						# flush logs
 						if self.ckpt_log.NumMessages() >= 2*len(self.ListOfNodes)//3 and self.mode == 'Checkpoint':
 							self.log.flush()
-							self.ckpt_log.flush()
-							print(f"{self.NodeId} -> Flushing logs!")
+							print(f"{self.NodeId} -> FLUSHING MESSAGE LOGS!")
 				# print(f"I am {self.NodeId} and I recieved a checkpoint message from {messaging.jwt().get_payload(message['token'])['i']}")
 
-				
+			elif message['type'].upper() == 'VIEW-CHANGE':
+				if handle_requests.VerifyViewChange(message, self.ListOfNodes):
+					self.view_change_log.AddViewChangeMessage(message)
+					# flush logs
+					if self.view_change_log.NumMessages() >= 2*len(self.ListOfNodes)//3 and self.mode == 'View-Change':
+						self.view += 1
+						print(f"{self.NodeId} -> I HAVE A NEW VIEW {self.view}!")
+						if self.IsPrimary():
+							print(f"{self.NodeId} -> Okay, so I'm the new primary for view {self.view}! I am telling everyone to finish changing view?")
+							new_view_message = handle_requests.CreateNewViewMessage(self.view, self.view_change_log, self.private_key)
+							print(new_view_message)
+							communication.Multicast('224.1.1.1', 8766, new_view_message)
+							print("I sent it dawk")
+							self.ChangeMode('Sleep')
+
+			elif message['type'].upper() == 'NEW-VIEW':
+				if handle_requests.VerifyNewView(message, self.ListOfNodes, int(self.view)%len(self.ListOfNodes)):
+					print(f"{self.NodeId} -> After changing views, I'm going to sleep....")
+					self.ChangeMode('Sleep')
+
+				# print(f"I am {self.NodeId} and I recieved a checkpoint message from {messaging.jwt().get_payload(message['token'])['i']}")
 
 
 	def HandShake(self, uri):

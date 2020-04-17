@@ -10,7 +10,7 @@ from utils import boolean
 
 #for quicker testing
 import argparse
-parser = argparse.ArgumentParser(description='Process some integers.')
+parser = argparse.ArgumentParser(description='To get same results without a lot of effort.')
 parser.add_argument('--OPTIMIZE', type=boolean, help='Do NOT use this for the final result', default=False)
 args = parser.parse_args()
 

@@ -64,6 +64,12 @@ class MessageLog:
 class CheckLog:
 	def __init__(self):
 		self.log = {}
+		'''
+		format:
+		self.log = {
+			i: last_checkpoint_message_from_i,
+		}
+		'''
 
 	def NumMessages(self):
 		return len(self.log)
@@ -79,5 +85,32 @@ class CheckLog:
 	def flush(self):
 		self.log = {}
 	
+	def Print(self):
+		print(self.log)
+
+class ViewChangeLog:
+	def __init__(self):
+		self.log = {}
+		'''
+		format:
+		self.log = {
+			i: last_view_change_message_from i,
+		}
+		'''
+
+	def NumMessages(self):
+		return len(self.log)
+
+	def AddViewChangeMessage(self, message):
+		'''
+		add view change message to log
+		'''
+		jwt = messaging.jwt()
+		view_change = jwt.get_payload(message['token'])
+		self.log[view_change['i']] = message['token']
+
+	def flush(self):
+		self.log = {}
+
 	def Print(self):
 		print(self.log)
