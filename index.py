@@ -24,6 +24,7 @@ MaxNodes = 19
 
 ConnectedClients = {}
 reply = {}
+view_change = {}
 primary = None
 n = 0
 view = 0
@@ -120,7 +121,7 @@ def on_connect(data):
 	message = {'type': 'Client', 'client_id': 1234567890, 'public_key': public.decode('utf-8'), 'Uri': 'http://'+IpAddr+':'+str(port) }
 	socketio.emit('clients', {'number': data['total_clients']})
 	time.sleep(1)
-	reply = communication.SendMsg(data['clients_info']['Uri'], message)
+	communication.SendMsg(data['clients_info']['Uri'], message)
 	# socketio.emit('log', {'no_clients': len(ConnectedClients), 'recv_client_info': ConnectedClients})
 
 @socketio.on('check_clients')
@@ -131,6 +132,7 @@ def on_log(data):
 
 @socketio.on('reply')
 def on_reply(data):
+	global reply
 	print(data)
 	jwt = messaging.jwt()
 	token = jwt.get_payload(data['token'])
@@ -139,17 +141,33 @@ def on_reply(data):
 		if token['r'] == reply[token['t']]['r']:
 			reply[token['t']]['count'] += 1
 	else:
-		reply[token['t']] = {'r': token['r'], 'count': 0}
+		reply[token['t']] = {'r': token['r'], 'count': 0, 'view': token['v']}
 
 	print(f"Count = {reply[token['t']]['count']}")
 	if reply[token['t']]['count'] >= (len(ConnectedClients)//3) + 1:
+		view = reply[token['t']]['view']
 		print("Socket emiting")
 		socketio.emit('Reply', {'reply': reply[token['t']]['r'] })
 		print("Socket emited")
 
-		
 
+# @socketio.on('view-change')
+# def on_view_change(data):
+# 	global view_change, view
+# 	jwt = messaging.jwt()
+# 	payload = jwt.get_payload(data)
 
+# 	#verify
+# 	if True: #change to verification
+# 		view_in_consideration = int(payload['v'])
+# 		if view_in_consideration not in view_change:
+# 			view_change[view_in_consideration] = 1
+# 		else:
+# 			view_change[view_in_consideration] += 1
+# 			if view_change[view_in_consideration] >= (len(ConnectedClients)//3) + 1:
+# 				view = int(view_in_consideration)
+# 				print("BEWARE! CLIENT GOING INTO VIEW", view)				
+# 				view_change = {}
 
 
 if __name__ == '__main__':

@@ -160,33 +160,35 @@ class Node(object):
 				# # # I am yet to implement client broadcasting the reqiest to all secondary nodes
 				if self.IsPrimary():
 					print(f"I am the primary with ID = {self.NodeId}. And I have just recieved a REQUEST from the client!")
+					# # # gen a new sequence number as (last+1)-----(default is 100)
+					seq_num = self.log.get_last_logged_seq_num() + 1
+					# # # Verify client's sign and returns the next message to send
+					final_message = handle_requests.Request(message, self.client_public_key, self.view, seq_num, self.private_key)
+					
+					if final_message is not None:
+						# # # sign on message verified
+						# print(len(self.ListOfNodes))
+						# Multicast the request all nodes in the network
+						communication.Multicast('224.1.1.1', 8766, final_message)
+
+
+						# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, final)
+						# BroadCast doesnot send this msg to Primary. Therefore a msg has to be sent manually
+						# await communication.SendMsgRoutine(self.Uri, final)
+						# Logging message from client and PrePrepare msg
+						# print(f"{self.NodeId} -> Message logging...")
+						# self.log.append(mlog.log(message))
+						# print(f"{self.NodeId} -> Message logged")
+
+					else:
+						'''Client did not verify'''
+						print(f"{self.NodeId} -> The message verification failed")
+						'''Nothing more to do'''
 				else:
-					print(f"Well I am not the primary with ID = {self.NodeId}. Why was I forwarded the REQUEST from the client?")
-				
-				# # # gen a new sequence number as (last+1)-----(default is 100)
-				seq_num = self.log.get_last_logged_seq_num() + 1
-				# # # Verify client's sign and returns the next message to send
-				final_message = handle_requests.Request(message, self.client_public_key, self.view, seq_num, self.private_key)
-				
-				if final_message is not None:
-					# # # sign on message verified
-					# print(len(self.ListOfNodes))
-					# Multicast the request all nodes in the network
-					communication.Multicast('224.1.1.1', 8766, final_message)
-
-
-					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, final)
-					# BroadCast doesnot send this msg to Primary. Therefore a msg has to be sent manually
-					# await communication.SendMsgRoutine(self.Uri, final)
-					# Logging message from client and PrePrepare msg
-					# print(f"{self.NodeId} -> Message logging...")
-					# self.log.append(mlog.log(message))
-					# print(f"{self.NodeId} -> Message logged")
-
-				else:
-					'''Client did not verify'''
-					print(f"{self.NodeId} -> The message verification failed")
-					'''Nothing more to do'''
+					print(f"Well I am NOT the primary with ID = {self.NodeId} in view {self.view}. I shall forward it to the required owner!")
+					print(self.ListOfNodes[str(int(self.view) %
+                                            len(self.ListOfNodes))]['Uri'])
+					await communication.SendMsgRoutine(self.ListOfNodes[str(int(self.view) % len(self.ListOfNodes))]['Uri'], message)
 
 
 			# # # PREPREPARE
@@ -276,7 +278,7 @@ class Node(object):
 						self.ChangeMode('Checkpoint')
 
 					# # # View change
-					if len(self.log.log) >= 1:
+					if len(self.log.log) >= 1 and self.mode != 'Checkpoint':
 						view_change_message = handle_requests.CreateViewChangeMessage(self.ckpt_log, self.log, self.view, self.NodeId, self.private_key)
 						# print(view_change_message)
 						communication.Multicast('224.1.1.1', 8766, view_change_message)
@@ -303,19 +305,16 @@ class Node(object):
 					self.view_change_log.AddViewChangeMessage(message)
 					# flush logs
 					if self.view_change_log.NumMessages() >= 2*len(self.ListOfNodes)//3 and self.mode == 'View-Change':
-						self.view += 1
-						print(f"{self.NodeId} -> I HAVE A NEW VIEW {self.view}!")
-						if self.IsPrimary():
-							print(f"{self.NodeId} -> Okay, so I'm the new primary for view {self.view}! I am telling everyone to finish changing view?")
+						# # # if new primary, tell everyone that view change successful!
+						if (int(self.view)+1) % len(self.ListOfNodes) == int(self.NodeId):
+							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view}! I am telling everyone to finish changing view?")
 							new_view_message = handle_requests.CreateNewViewMessage(self.view, self.view_change_log, self.private_key)
-							print(new_view_message)
 							communication.Multicast('224.1.1.1', 8766, new_view_message)
-							print("I sent it dawk")
-							self.ChangeMode('Sleep')
 
 			elif message['type'].upper() == 'NEW-VIEW':
-				if handle_requests.VerifyNewView(message, self.ListOfNodes, int(self.view)%len(self.ListOfNodes)):
-					print(f"{self.NodeId} -> After changing views, I'm going to sleep....")
+				if handle_requests.VerifyNewView(message, self.ListOfNodes, int(self.view+1)%len(self.ListOfNodes)):
+					self.view += 1
+					print(f"{self.NodeId} -> After changing views to {self.view}, I'm going to sleep....")
 					self.ChangeMode('Sleep')
 
 				# print(f"I am {self.NodeId} and I recieved a checkpoint message from {messaging.jwt().get_payload(message['token'])['i']}")

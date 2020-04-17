@@ -81,7 +81,7 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 	mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
 	sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 	while True:
-		data = sock.recv(10240)
+		data = sock.recv(50240)
 		# print(data)
 		data = json.loads(data)
 
