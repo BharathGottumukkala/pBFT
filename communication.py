@@ -94,7 +94,7 @@ async def BroadCast(SenderIp, SenderPort, ListOfClients, Msg):
 
 
 
-def Multicast(MCAST_GRP, MCAST_PORT, msg):
+def Multicast(MCAST_GRP, MCAST_PORT, msg, faults=None):
 	# Multicast Send to the multicast server running on each node
 	# I found only 2 multicast grps : 224.1.1.1, 225.1.1.1
 	# We can have any port
@@ -107,8 +107,24 @@ def Multicast(MCAST_GRP, MCAST_PORT, msg):
 	sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
 		
 	message = json.dumps(msg).encode('utf-8')
-	
-	sent = sock.sendto(message, (MCAST_GRP, MCAST_PORT))
+
+	if faults is not None:
+		if faults['malicious']:
+			# Implement after deciding what to implement
+			pass
+		elif faults['reboot']:
+			time.sleep(5)
+			# Have to reinitialize node properties
+			# Dont send msg
+		elif faults['netdelay']:
+			time.delay(2)
+			sent = sock.sendto(message, (MCAST_GRP, MCAST_PORT))
+
+		elif faults['benign']:
+			sent = sock.sendto(message, (MCAST_GRP, MCAST_PORT))
+
+	else:
+		sent = sock.sendto(message, (MCAST_GRP, MCAST_PORT))
 
 
 def MulticastServer(MCAST_GRP, MCAST_PORT, node):

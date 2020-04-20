@@ -47,13 +47,14 @@ class Node(object):
 		self.ListOfNodes = {}
 		self.pre_prepare_msgs = 0
 		self.mode = 'Sleep'
-		self.view = 3
+		self.view = 0
 		self.count = 0
 		self.log = mlog.MessageLog()
 		self.ckpt_log = mlog.CheckLog()
 		self.view_change_log = mlog.ViewChangeLog()
 
 		self.total_allocated = 0
+		self.faults = {'malicious': False, 'reboot': False, 'netdelay': False, 'benign':True}
 		"""
 		self.ListOfNodes = {'NodeID': {uska details}}
 		
@@ -169,7 +170,7 @@ class Node(object):
 				self.log.flush()
 				self.ckpt_log.flush()
 				self.view_change_log.flush()
-				self.view = 3
+				self.view = 0
 				self.total_allocated = message['total']
 				report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'allocated'})
 
@@ -183,6 +184,15 @@ class Node(object):
 				self.view = 0
 				self.total_allocated = message['total']
 				report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'deallocated'})
+
+			elif message['type'].upper() == 'MODIFYFAULT':
+				del message['id']
+				del message['type']
+				for fault, value in message.items():
+					self.faults[fault] = value
+				print(f"{self.NodeId} -> Modified Fault parameters")
+				print(self.faults)
+
 
 
 			# # # Get and register client's info
@@ -215,7 +225,7 @@ class Node(object):
 						# # # sign on message verified
 						# print(len(self.ListOfNodes))
 						# Multicast the request all nodes in the network
-						communication.Multicast('224.1.1.1', 8766, final_message)
+						communication.Multicast('224.1.1.1', 8766, final_message, self.faults)
 
 
 						# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, final)
@@ -262,7 +272,7 @@ class Node(object):
 					self.log.AddPrepare(result)
 					print(f"{self.NodeId} -> self Prepare logged")
 					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, result)
-					communication.Multicast('224.1.1.1', 8766, result)
+					communication.Multicast('224.1.1.1', 8766, result, self.faults)
 				else:
 					# # # Some malicious activity. TO DO!
 					pass
@@ -297,7 +307,7 @@ class Node(object):
 						self.ChangeMode("Commit")
 						# Report to UI the change in mode
 						report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'commit'})
-						communication.Multicast('224.1.1.1', 8766, commit)
+						communication.Multicast('224.1.1.1', 8766, commit, self.faults)
 						print(f"{self.NodeId} -> Changing from PREPARE TO COMMIT")
 							# print(json.dumps(self.log))
 						

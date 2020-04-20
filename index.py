@@ -223,6 +223,14 @@ def on_status(data):
 	socketio.emit('status', data)
 
 
+@socketio.on('faults')
+def on_faults(data):
+	print(f"Fault update received for Node {data['id']}")
+	data['type'] = "ModifyFault"
+	t1 = threading.Thread(target=communication.SendMsg, args=(ConnectedClients[data['id']]['Uri'], data))
+	t1.start()
+
+
 
 # @socketio.on('view-change')
 # def on_view_change(data):
