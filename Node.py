@@ -103,6 +103,8 @@ class Node(object):
 		else:
 			return str(self.view % self.total_allocated) == str(self.NodeId)
 
+	def SendStatusUpdate(self, new_mode):
+		report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': new_mode})
 
 
 	def ChangeMode(self, mode):
@@ -110,6 +112,8 @@ class Node(object):
 		if mode not in possible_modes:
 			raise f"{mode} is not a valid mode. Please select from {possible_modes}"
 		self.mode = mode
+		self.SendStatusUpdate(self.mode.lower())
+		print("Changing mode:", self.mode.lower())
 
 
 	def register(self, message):
@@ -172,7 +176,8 @@ class Node(object):
 				self.view_change_log.flush()
 				self.view = 0
 				self.total_allocated = message['total']
-				report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'allocated'})
+				self.SendStatusUpdate('allocated')
+				# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'allocated'})
 
 			# # # DeAllocate the node from the cluster
 			elif message['type'].upper() == 'DEALLOCATE':
@@ -183,7 +188,9 @@ class Node(object):
 				self.view_change_log.flush()
 				self.view = 0
 				self.total_allocated = message['total']
-				report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'deallocated'})
+				self.SendStatusUpdate('deallocated')
+				# report.Report(self.client_uri, 'status', {
+				#               'id': self.NodeId, 'status': 'deallocated'})
 
 			elif message['type'].upper() == 'MODIFYFAULT':
 				del message['id']
@@ -217,7 +224,8 @@ class Node(object):
 					# # # gen a new sequence number as (last+1)-----(default is 100)
 					seq_num = self.log.get_last_logged_seq_num() + 1
 					# Report UI that request has been received
-					report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'request'})
+					self.SendStatusUpdate("request")
+					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'request'})
 					# # # Verify client's sign and returns the next message to send
 					final_message = handle_requests.Request(message, self.client_public_key, self.view, seq_num, self.private_key)
 					
@@ -241,7 +249,8 @@ class Node(object):
 						print(f"{self.NodeId} -> The message verification failed")
 						'''Nothing more to do'''
 						# Report UI that node is going back to sleep
-						report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'sleep'})
+						self.ChangeMode('Sleep')
+						# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'sleep'})
 				else:
 					print(f"Well I am NOT the primary with ID = {self.NodeId} in view {self.view}. I shall forward it to the required owner!")
 					print(self.ListOfNodes[str(int(self.view) %
@@ -262,7 +271,7 @@ class Node(object):
 				if result is not None:
 					self.ChangeMode("Prepare")
 					# Report to UI the change in mode
-					report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'prepare'})
+					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'prepare'})
 					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, result)
 					# print(f"{self.NodeId} -> PrePrepare logging...")
 					self.log.AddPrePrepare(message)
@@ -306,7 +315,7 @@ class Node(object):
 						# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, commit)
 						self.ChangeMode("Commit")
 						# Report to UI the change in mode
-						report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'commit'})
+						# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'commit'})
 						communication.Multicast('224.1.1.1', 8766, commit, self.faults)
 						print(f"{self.NodeId} -> Changing from PREPARE TO COMMIT")
 							# print(json.dumps(self.log))
@@ -326,12 +335,13 @@ class Node(object):
 				if count >= 2*self.total_allocated//3 and self.mode == 'Commit':
 					reply = handle_requests.CreateReply(message, self.log, self.NodeId, self.private_key)
 					# Report to UI that reply is to be sent
-					report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'reply'})
+					self.SendStatusUpdate('reply')
+					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'reply'})
 					report.Report(self.client_uri, 'reply', reply)
 					print(f"{self.NodeId} -> Sent a REPLY to the client!")
 					self.ChangeMode('Sleep')
 					# Report to UI the change in mode
-					report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'sleep'})
+					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'sleep'})
 					print(f"{len(self.log.log)}, mode = {self.mode}, view = {self.view}")
 					# # # CHECKPOINTING
 					if len(self.log.log) >= 2:
@@ -370,6 +380,8 @@ class Node(object):
 						if self.ckpt_log.NumMessages() >= 2*self.total_allocated//3 and self.mode == 'Checkpoint':
 							self.log.flush()
 							print(f"{self.NodeId} -> FLUSHING MESSAGE LOGS!")
+							self.ChangeMode('Sleep')
+
 				# print(f"I am {self.NodeId} and I recieved a checkpoint message from {messaging.jwt().get_payload(message['token'])['i']}")
 
 			elif message['type'].upper() == 'VIEW-CHANGE':
@@ -396,7 +408,7 @@ class Node(object):
 				if handle_requests.VerifyNewView(message, self.ListOfNodes, int(self.view+1)%self.total_allocated):
 					self.view = self.view + 1
 					print(f"{self.NodeId} -> After changing views to {self.view}, I'm going to sleep....")
-					report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'view_change'})
+					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'view_change'})
 					self.ChangeMode('Sleep')
 
 				# print(f"I am {self.NodeId} and I recieved a checkpoint message from {messaging.jwt().get_payload(message['token'])['i']}")

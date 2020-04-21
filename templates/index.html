@@ -1217,8 +1217,8 @@
       console.log(JSON.stringify({id: NodeID, malicious: malicious, reboot: reboot, netdelay: netdelay, benign: benign}))
 
     }
-    $('#alloc_form').hide();
-    $('#addClass_form').hide();
+    // $('#alloc_form').hide();
+    // $('#addClass_form').hide();
     var i;
     for(i=0; i<19; i++){
       $('#' + i.toString() + '_text').hide();
@@ -1237,21 +1237,21 @@
 
     }
 
-    $('#alloc_class').hover(function() {
-        $('#alloc_form').show();
+    // $('#alloc_class').hover(function() {
+    //     $('#alloc_form').show();
 
-      }, function() {
-        $('#alloc_form').hide();
+    //   }, function() {
+    //     $('#alloc_form').hide();
       
-    });
+    // });
 
-    $('#add_class').hover(function() {
-        $('#add_form').show();
+    // $('#add_class').hover(function() {
+    //     $('#add_form').show();
 
-      }, function() {
-        $('#add_form').hide();
+    //   }, function() {
+    //     $('#add_form').hide();
       
-    });
+    // });
 
 
     $('#btnalloc').click(function (e) {
@@ -1336,7 +1336,7 @@
           $('#' + msg['id'].toString() + '_card').show()
 
         }
-        else if (msg['status'] == 'view_change'){
+        else if (msg['status'] == 'view-change'){
           $('#' + msg['id'].toString() + '_view').text('\t\tView = ' + msg['view']);
           $('#' + msg['id'].toString() + '_view').css({ 'color': 'green', 'font-size': '120%' });
           var refreshId = setInterval( function() 
