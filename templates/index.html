@@ -372,17 +372,29 @@
 
             <!-- Earnings (Monthly) Card Example -->
             <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-success shadow h-100 py-2">
+              <div id="alloc_class" class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div style="font-size: 120%" class="text-xs font-weight-bold text-success text-uppercase mb-1">Allocated Nodes</div>
                       <div id="alloc_nodes" style="font-size: 150%" class="h5 mb-0 font-weight-bold text-gray-800">{{ nodes_info["allocated"] }}</div>
                     </div>
-                    <div class="col-auto">
+                    <!-- <div class="col-auto">
                       <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div> -->
+
+                    <div id="alloc_form" class="row no-gutters align-items-center">
+                      <form  autocomplete="off" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
+
+                        <input type="text" placeholder="Number of nodes to allocate" class="form-control bg-light border-0 small" id="allocate" name="result"><br><br>
+                        <input type="button" class="btn btn-info" id="btnalloc" value="Allocate">
+                        <input type="button" class="btn btn-danger" style="float: right;" id="btndealloc" value="Remove"><br>
+                      </form>
                     </div>
                   </div>
+                  
+
+
                 </div>
               </div>
             </div>
@@ -390,24 +402,35 @@
             <!-- Earnings (Monthly) Card Example -->
             <div class="col-xl-3 col-md-6 mb-4">
               <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
+                <div id="add_class" class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div style="font-size: 120%" class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks</div>
+                      <div style="font-size: 120%" class="text-xs font-weight-bold text-info text-uppercase mb-1">Addition</div>
                       <div class="row no-gutters align-items-center">
-                        <div class="col-auto">
+                        <div id="add_form">
+                          <form autocomplete="off" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
+
+                            <!-- <label for="number">Number1:</label> -->
+                            <input type="text" placeholder="Number1" class="form-control bg-light border-0" id="n1" name="n1">
+                            <!-- <label for="number">Number2:</label> -->
+                            <input type="text" placeholder="Number2" class="form-control bg-light border-0" id="n2" name="n2"><br><br>
+                            <input type="button" class="btn btn-info" id="btnsubmit" value="Submit">
+                            <input type="text" style="float: right;" placeholder="Result will be shown here.." class="form-control bg-light border-0 small" id="result" name="result">
+                          </form>
+                        </div>
+                        <!-- <div class="col-auto">
                           <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
                         </div>
                         <div class="col">
                           <div class="progress progress-sm mr-2">
                             <div class="progress-bar bg-info" id="progress_bar" role="progressbar" style="width: 90%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                           </div>
-                        </div>
+                        </div> -->
                       </div>
                     </div>
-                    <div class="col-auto">
+                    <!-- <div class="col-auto">
                       <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -433,152 +456,6 @@
 
           <!-- Content Row -->
 
-          <div class="row">
-
-            <!-- Area Chart -->
-            <div class="col-xl-8 col-lg-7">
-              <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
-                  <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                      <div class="dropdown-header">Dropdown Header:</div>
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                  <div class="chart-area">
-                    <canvas id="myAreaChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Pie Chart -->
-            <div class="col-xl-2 col-lg-3">
-              <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 style="font-size: 120%" class="m-0 font-weight-bold text-primary">Add Two Numbers</h6>
-                  
-                  <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                      <div class="dropdown-header">Dropdown Header:</div>
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                  <div>
-                    <form  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
-
-                      <!-- <label for="number">Number1:</label> -->
-                      <input type="text" placeholder="Number1" class="form-control bg-light border-0 small" id="n1" name="n1"><br><br><br>
-                      <!-- <label for="number">Number2:</label> -->
-                      <input type="text" placeholder="Number" class="form-control bg-light border-0 small" id="n2" name="n2"><br><br><br>
-                      <input type="button" class="btn btn-info" id="btnsubmit" value="Submit"><br><br>
-                      <input type="text" placeholder="Result will be shown here.." class="form-control bg-light border-0 small" id="result" name="result"><br><br><br>
-                    </form>
-                  </div>
-                  <!-- <div class="chart-pie pt-4 pb-2">
-                    <canvas id="myPieChart"></canvas>
-                  </div>
-                  <div class="mt-4 text-center small">
-                    <span class="mr-2">
-                      <i class="fas fa-circle text-primary"></i> Direct
-                    </span>
-                    <span class="mr-2">
-                      <i class="fas fa-circle text-success"></i> Social
-                    </span>
-                    <span class="mr-2">
-                      <i class="fas fa-circle text-info"></i> Referral
-                    </span>
-                  </div> -->
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-2 col-lg-3">
-              <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 style="font-size: 120%" class="m-0 font-weight-bold text-primary">Allocate Nodes</h6>
-                  
-                  <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                      <div class="dropdown-header">Dropdown Header:</div>
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                  <div>
-                    <form  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
-
-                      <input type="text" placeholder="Number of nodes to allocate" class="form-control bg-light border-0 small" id="allocate" name="result"><br><br>
-                      <input type="button" class="btn btn-info" id="btnalloc" value="Submit"><br>
-                    </form>
-                  </div>
-                </div>
-              </div>
-
-
-              <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 style="font-size: 120%;" class="m-0 font-weight-bold text-primary">Deallocate Nodes</h6>
-                  
-                  <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                      <div class="dropdown-header">Dropdown Header:</div>
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                  </div>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                  <div>
-                    <form  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
-
-                      <input type="text" style="font-size: 100%" placeholder="Number of nodes to deallocate" class="form-control bg-light border-0 small" id="deallocate" name="result"><br><br>
-                      <input type="button" class="btn btn-danger" id="btndealloc" value="Submit"><br>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- Content Row -->
           <div class="row">
 
             <!-- Content Column -->
@@ -668,495 +545,596 @@
                   </div>
                 </div>
               </div>
-
-              
-
             </div>
 
-
             <div class="col-lg-6 mb-4">
-              <!-- Color System -->
-              <div class="row">
-                <div class="col-lg-2 mb-6">
-                  <div id="0_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="0_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
-                          Node Id 0
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="0_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="0_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="0_malicious" class="dropdown-item" href="#">Malicious
-                            <form>
-                              <input type="text" id="0_malicious_data">
-                            </form>
+              <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Node Settings</h6>
+                </div>
+              
+                <!-- Color System -->
+                <div class="row">
+                  <div class="col-lg-2 mb-4">
+                    <div id="0_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="0_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
+                            Node Id 0
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="0_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="0_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="0_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="0_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="0_malicious" class="dropdown-item" href="#">Malicious
+                              <form>
+                                <input type="text" id="0_malicious_data">
+                              </form>
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="0_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="0_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-lg-2 mb-4">
-                  <div id="1_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="1_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
-                          Node Id 1
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="1_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="1_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="1_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="1_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="1_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
+                            Node Id 1
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="1_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="1_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="1_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="1_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="1_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="1_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="1_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-lg-2 mb-4">
-                  <div id="2_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="2_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
-                          Node Id 2
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="2_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="2_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="2_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="2_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="2_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
+                            Node Id 2
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="2_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="2_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="2_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="2_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="2_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="2_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="2_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-lg-2 mb-4">
-                  <div id="3_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="3_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
-                          Node Id 3
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="3_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="3_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="3_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="3_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="3_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
+                            Node Id 3
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="3_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="3_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="3_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="3_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="3_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="3_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="3_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-lg-2 mb-4">
-                  <div id="4_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="4_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
-                          Node Id 4
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="4_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="4_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="4_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="4_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="4_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
+                            Node Id 4
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="4_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="4_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="4_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="4_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="4_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="4_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="4_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-lg-2 mb-4">
-                  <div id="5_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="5_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
-                          Node Id 5
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="5_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="5_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="5_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="5_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="5_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
+                            Node Id 5
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="5_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="5_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="5_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="5_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="5_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="5_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="5_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="6_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="6_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-600"></i> -->
-                          Node Id 6
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="6_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="6_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="6_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="6_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="6_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-600"></i> -->
+                            Node Id 6
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="6_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="6_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="6_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="6_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="6_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="6_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="6_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="7_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="7_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-700"></i> -->
-                          Node Id 7
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="7_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="7_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="7_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="7_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="7_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-700"></i> -->
+                            Node Id 7
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="7_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="7_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="7_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="7_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="7_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="7_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="7_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="8_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="8_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-800"></i> -->
-                          Node Id 8
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="8_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="8_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="8_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="8_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="8_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-800"></i> -->
+                            Node Id 8
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="8_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="8_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="8_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="8_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="8_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="8_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="8_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="9_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="9_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-900"></i> -->
-                          Node Id 9
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="9_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="9_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="9_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="9_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="9_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-900"></i> -->
+                            Node Id 9
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="9_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="9_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="9_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="9_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="9_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="9_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="9_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="10_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="10_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1000"></i> -->
-                          Node Id 10
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="10_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="10_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="10_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="10_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="10_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1000"></i> -->
+                            Node Id 10
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="10_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="10_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="10_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="10_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="10_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="10_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="10_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="11_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="11_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1100"></i> -->
-                          Node Id 11
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="11_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="11_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="11_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="11_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="11_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1100"></i> -->
+                            Node Id 11
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="11_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="11_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="11_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="11_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="11_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="11_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="11_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="12_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="12_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1200"></i> -->
-                          Node Id 12
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="12_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="12_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="12_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="12_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="12_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1200"></i> -->
+                            Node Id 12
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="12_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="12_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="12_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="12_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="12_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="12_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="12_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="13_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="13_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1300"></i> -->
-                          Node Id 13
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="13_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="13_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="13_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="13_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="13_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1300"></i> -->
+                            Node Id 13
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="13_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="13_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="13_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="13_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="13_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="13_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="13_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="14_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="14_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1400"></i> -->
-                          Node Id 14
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="14_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="14_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="14_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="14_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="14_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1400"></i> -->
+                            Node Id 14
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="14_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="14_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="14_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="14_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="14_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="14_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="14_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="15_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="15_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1500"></i> -->
-                          Node Id 15
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="15_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="15_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="15_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="15_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="15_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1500"></i> -->
+                            Node Id 15
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="15_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="15_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="15_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="15_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="15_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="15_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="15_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="16_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="16_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1600"></i> -->
-                          Node Id 16
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="16_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="16_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="16_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="16_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="16_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1600"></i> -->
+                            Node Id 16
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="16_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="16_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="16_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="16_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="16_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="16_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="16_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="17_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="17_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1700"></i> -->
-                          Node Id 17
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="17_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="17_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="17_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="17_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="17_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1700"></i> -->
+                            Node Id 17
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="17_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="17_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="17_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="17_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="17_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="17_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="17_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="col-lg-2 mb-4">
-                  <div id="18_card" class="card bg-success text-center shadow">
-                    <div class="card-body">
-                      <div class="dropdown no-arrow">
-                        <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="18_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1800"></i> -->
-                          Node Id 18
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                          <div class="dropdown-header">Types of Faults:</div>
-                          <a id="18_reboot" class="dropdown-item" href="#">Reboot</a>
-                          <a id="18_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                          <a id="18_malicious" class="dropdown-item" href="#">Malicious
+                  <div class="col-lg-2 mb-4">
+                    <div id="18_card" class="card bg-success text-center shadow">
+                      <div class="card-body">
+                        <div class="dropdown no-arrow">
+                          <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="18_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1800"></i> -->
+                            Node Id 18
                           </a>
-                          <!-- <div class="dropdown-divider"></div> -->
-                          <div class="dropdown-header">Remove all faults?:</div>
-                          <a id="18_benign" class="dropdown-item" href="#">Benign</a>
-                          <a id="18_benign" class="dropdown-item" href="#">Node State</a>
-                          
+                          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Types of Faults:</div>
+                            <a id="18_reboot" class="dropdown-item" href="#">Reboot</a>
+                            <a id="18_netdelay" class="dropdown-item" href="#">Network Delay</a>
+                            <a id="18_malicious" class="dropdown-item" href="#">Malicious
+                            </a>
+                            <!-- <div class="dropdown-divider"></div> -->
+                            <div class="dropdown-header">Remove all faults?:</div>
+                            <a id="18_benign" class="dropdown-item" href="#">Benign</a>
+                            <a id="18_benign" class="dropdown-item" href="#">Node State</a>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
+                  </div>    
+                </div>
+              </div>
+            </div>
+
+            <!-- Pie Chart -->
+            <!-- <div class="col-xl-2 col-lg-3">
+              <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 style="font-size: 120%" class="m-0 font-weight-bold text-primary">Add Two Numbers</h6>
+                  
+                  <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                      <div class="dropdown-header">Dropdown Header:</div>
+                      <a class="dropdown-item" href="#">Action</a>
+                      <a class="dropdown-item" href="#">Another action</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
                   </div>
                 </div>
+                <div class="card-body">
+                  <div>
+                    <form  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
 
-                
+                      <input type="text" placeholder="Number1" class="form-control bg-light border-0 small" id="n1" name="n1"><br><br><br>
+                      <input type="text" placeholder="Number" class="form-control bg-light border-0 small" id="n2" name="n2"><br><br><br>
+                      <input type="button" class="btn btn-info" id="btnsubmit" value="Submit"><br><br>
+                      <input type="text" placeholder="Result will be shown here.." class="form-control bg-light border-0 small" id="result" name="result"><br><br><br>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+            <!-- <div class="col-xl-2 col-lg-3">
+              <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 style="font-size: 120%" class="m-0 font-weight-bold text-primary">Allocate Nodes</h6>
+                  
+                  <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                      <div class="dropdown-header">Dropdown Header:</div>
+                      <a class="dropdown-item" href="#">Action</a>
+                      <a class="dropdown-item" href="#">Another action</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div>
+                    <form  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
+
+                      <input type="text" placeholder="Number of nodes to allocate" class="form-control bg-light border-0 small" id="allocate" name="result"><br><br>
+                      <input type="button" class="btn btn-info" id="btnalloc" value="Submit"><br>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 style="font-size: 120%;" class="m-0 font-weight-bold text-primary">Deallocate Nodes</h6>
+                  
+                  <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                      <div class="dropdown-header">Dropdown Header:</div>
+                      <a class="dropdown-item" href="#">Action</a>
+                      <a class="dropdown-item" href="#">Another action</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div>
+                    <form  class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{ url_for('interactive') }}" method="POST">
+
+                      <input type="text" style="font-size: 100%" placeholder="Number of nodes to deallocate" class="form-control bg-light border-0 small" id="deallocate" name="result"><br><br>
+                      <input type="button" class="btn btn-danger" id="btndealloc" value="Submit"><br>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div> -->
           </div>
 
-        </div>
+
+          <!-- Content Row -->
+          <!-- <div class="row"> -->
+
+            
+
+
+            
         <!-- /.container-fluid -->
 
-      </div>
+      <!-- </div> -->
       <!-- End of Main Content -->
 
       <!-- Footer -->
@@ -1239,6 +1217,8 @@
       console.log(JSON.stringify({id: NodeID, malicious: malicious, reboot: reboot, netdelay: netdelay, benign: benign}))
 
     }
+    $('#alloc_form').hide();
+    $('#addClass_form').hide();
     var i;
     for(i=0; i<19; i++){
       $('#' + i.toString() + '_text').hide();
@@ -1246,6 +1226,32 @@
       $('#' + i.toString() + '_progress').hide();
       $('#' + i.toString() + '_card').hide();
     }
+    var alloc_nodes = $('#alloc_nodes').text()
+    console.log("alloc_nodes = " + alloc_nodes)
+
+    for(i=0; i<alloc_nodes; i++){
+      $('#' + i.toString() + '_text').show();
+      $('#' + i.toString() + '_bar').show();
+      $('#' + i.toString() + '_progress').show();
+      $('#' + i.toString() + '_card').show();
+
+    }
+
+    $('#alloc_class').hover(function() {
+        $('#alloc_form').show();
+
+      }, function() {
+        $('#alloc_form').hide();
+      
+    });
+
+    $('#add_class').hover(function() {
+        $('#add_form').show();
+
+      }, function() {
+        $('#add_form').hide();
+      
+    });
 
 
     $('#btnalloc').click(function (e) {
@@ -1257,7 +1263,7 @@
 
     $('#btndealloc').click(function (e) {
       console.log('DeAllocating nodes...');
-      var value = $('#deallocate').val();
+      var value = $('#allocate').val();
 
       socket.emit('deallocate', {nodes: value});
     });
@@ -1371,7 +1377,7 @@
           $('#' + msg['id'].toString() + '_progress').css('width' , '0%'); 
         }
 
-        if(msg['status'] != 'allocated'){
+        if(msg['status'] != 'allocated' && msg['status'] != 'deallocated'){
           $('#' + msg['id'].toString() + '_progress').text(msg['status']); 
         }
 
