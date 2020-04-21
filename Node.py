@@ -115,7 +115,7 @@ class Node(object):
 		self.mode = mode
 		self.SendStatusUpdate(self.mode.lower())
 		print("Changing mode:", self.mode.lower())
-		time.sleep(0.5)
+		time.sleep(0.51)
 
 
 	def register(self, message):
