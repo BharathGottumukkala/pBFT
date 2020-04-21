@@ -8,6 +8,7 @@ import time
 import argparse
 import re
 import os
+import time
 
 # Custom imports
 
@@ -114,6 +115,7 @@ class Node(object):
 		self.mode = mode
 		self.SendStatusUpdate(self.mode.lower())
 		print("Changing mode:", self.mode.lower())
+		time.sleep(0.5)
 
 
 	def register(self, message):
