@@ -112,10 +112,10 @@ class Node(object):
 		possible_modes = ['Sleep', 'Prepare', 'Commit', 'Checkpoint', 'View-Change']
 		if mode not in possible_modes:
 			raise f"{mode} is not a valid mode. Please select from {possible_modes}"
+		print(f"{self.NodeId} changing mode from {self.mode} to {mode}")
 		self.mode = mode
 		self.SendStatusUpdate(self.mode.lower())
-		print("Changing mode:", self.mode.lower())
-		time.sleep(0.51)
+		# time.sleep(0.5)
 
 
 	def register(self, message):
@@ -156,6 +156,10 @@ class Node(object):
 			# message = {'type': type, 'token': token}
 			# token is generated using messaging library in handle_requests
 			message = json.loads(message)
+
+			# # # ID = 3 is faulty for testing
+			# if int(self.NodeId) == 2:
+			# 	return
 			
 			# # # We enter 'View-Change' mode when some error is detected. So no messages except VIEW-CHANGE are accepted
 			if message['type'].upper() not in ['VIEW-CHANGE', 'NEW-VIEW'] and self.mode == 'View-Change':
@@ -212,56 +216,41 @@ class Node(object):
 				self.client_public_key = message['public_key'].encode('utf-8')
 				self.client_uri = message['Uri']
 				print(f"{self.NodeId} -> Received Client publickey")
-				# This report is the first report thatwas taking time for some reason
-				# Added here so that it goes unnoticed in the startup process of emulab
+				# # # This report is the first report thatwas taking time for some reason
+				# # # Added here so that it goes unnoticed in the startup process of emulab
 				if self.IsPrimary():
 					report.Report(self.client_uri, 'status', {'test': 'All the best'})
 
 
 			# # # Request recieved from client
-			elif message['type'].upper() == 'REQUEST':
-				# # # I am yet to implement client broadcasting the reqiest to all secondary nodes
+			elif message['type'].upper() == 'REQUEST' and self.mode == 'Sleep':
 				if self.IsPrimary():
 					print(f"I am the primary with ID = {self.NodeId}. And I have just recieved a REQUEST from the client!")
+
 					# # # gen a new sequence number as (last+1)-----(default is 100)
 					seq_num = self.log.get_last_logged_seq_num() + 1
-					# Report UI that request has been received
+
+					# # # Report UI that request has been received
 					self.SendStatusUpdate("request")
-					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'request'})
+
 					# # # Verify client's sign and returns the next message to send
 					final_message = handle_requests.Request(message, self.client_public_key, self.view, seq_num, self.private_key)
 					
 					if final_message is not None:
-						# # # sign on message verified
-						# print(len(self.ListOfNodes))
-						# Multicast the request all nodes in the network
+						# # # sign on message verified: Multicast the request all nodes in the network
 						communication.Multicast('224.1.1.1', 8766, final_message, self.faults)
-
-
-						# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, final)
-						# BroadCast doesnot send this msg to Primary. Therefore a msg has to be sent manually
-						# await communication.SendMsgRoutine(self.Uri, final)
-						# Logging message from client and PrePrepare msg
-						# print(f"{self.NodeId} -> Message logging...")
-						# self.log.append(mlog.log(message))
-						# print(f"{self.NodeId} -> Message logged")
-
 					else:
-						'''Client did not verify'''
+						# # # Client did not verify
 						print(f"{self.NodeId} -> The message verification failed")
-						'''Nothing more to do'''
-						# Report UI that node is going back to sleep
-						self.ChangeMode('Sleep')
-						# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'sleep'})
+						# # # Nothing more to do
 				else:
+					# # # Node is not primary. Send the message to the actual 
 					print(f"Well I am NOT the primary with ID = {self.NodeId} in view {self.view}. I shall forward it to the required owner!")
-					print(self.ListOfNodes[str(int(self.view) %
-                                            self.total_allocated)]['Uri'])
 					await communication.SendMsgRoutine(self.ListOfNodes[str(int(self.view) % self.total_allocated)]['Uri'], message)
 
 
 			# # # PREPREPARE
-			elif message['type'].upper() == 'PREPREPARE':
+			elif message['type'].upper() == 'PREPREPARE' and self.mode == 'Sleep':
 				print(f"ID = {self.NodeId}, primary={self.IsPrimary()}. Starting PREPREPARE.")
 				# print(message)
 				public_key_primary = self.ListOfNodes[str(self.view % self.total_allocated)]['public_key']
@@ -272,21 +261,14 @@ class Node(object):
 				# # # verification successful
 				if result is not None:
 					self.ChangeMode("Prepare")
-					# Report to UI the change in mode
-					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'prepare'})
-					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, result)
 					# print(f"{self.NodeId} -> PrePrepare logging...")
 					self.log.AddPrePrepare(message)
-					print(f"{self.NodeId} -> PrePrepare logged")
+					# print(f"{self.NodeId} -> PrePrepare logged")
 
 					# print(f"{self.NodeId} -> self Prepare logging...")
 					self.log.AddPrepare(result)
-					print(f"{self.NodeId} -> self Prepare logged")
-					# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, result)
+					# print(f"{self.NodeId} -> self Prepare logged")
 					communication.Multicast('224.1.1.1', 8766, result, self.faults)
-				else:
-					# # # Some malicious activity. TO DO!
-					pass
 
 			
 			# # # PREPARE
@@ -297,38 +279,22 @@ class Node(object):
 				
 				# # # m should be in logs
 				verify_m = (pToken['d'] in self.log.log)
-				# for log in self.log:
-				# 	if pToken['d'] == log['d']:
-				# 		if 'm' in log:
-				# 			verify_m = True
 
 				if verify_p and verify_m:
 					self.log.AddPrepare(message)
 					cur_log = self.log.RequestLog(pToken)
 					count = len(cur_log['prepare'])
-					# print(f"{self.NodeId} -> others Prepare logged")
-				# print(f"Count = {self.count}, ID = {self.NodeId}")
 
-
+				# If enough 2f+1 nodes ready to 'Prepare', go to 'Commit'
 				if count >= 2*self.total_allocated//3 :
 					if self.mode == 'Prepare':
-						# print(f"{self.NodeId} -> CreateCommit##")
 						commit = handle_requests.CreateCommit(message, self.NodeId, self.private_key)
-						# await communication.BroadCast(self.NodeIPAddr, self.port, self.ListOfNodes, commit)
 						self.ChangeMode("Commit")
-						# Report to UI the change in mode
-						# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'commit'})
 						communication.Multicast('224.1.1.1', 8766, commit, self.faults)
-						print(f"{self.NodeId} -> Changing from PREPARE TO COMMIT")
-							# print(json.dumps(self.log))
-						
-						# self.count = 0
 
 			elif message['type'].upper() == 'COMMIT':
 				verify_p, cToken = handle_requests.Prepare(message, self.ListOfNodes, self.view)
 				if verify_p:
-					# print(f"{self.NodeId} -> Commit logging...")
-					# self.log.append(mlog.log(result))
 					self.log.AddCommit(message)
 					# print(f"{self.NodeId} -> Commit logged")
 
@@ -336,35 +302,31 @@ class Node(object):
 				count = len(cur_log['commit'])
 				if count >= 2*self.total_allocated//3 and self.mode == 'Commit':
 					reply = handle_requests.CreateReply(message, self.log, self.NodeId, self.private_key)
-					# Report to UI that reply is to be sent
-					self.SendStatusUpdate('reply')
-					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'reply'})
 					report.Report(self.client_uri, 'reply', reply)
+					self.SendStatusUpdate('reply')  # Report to UI that reply is to be sent
 					print(f"{self.NodeId} -> Sent a REPLY to the client!")
 					self.ChangeMode('Sleep')
-					# Report to UI the change in mode
-					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'status': 'sleep'})
-					print(f"{len(self.log.log)}, mode = {self.mode}, view = {self.view}")
+
 					# # # CHECKPOINTING
-					if len(self.log.log) >= 2:
-						print(f"CHECKPOINTING, messages = {len(self.log.log)}")
-						# if more than 5 messages in message log, flush it!
-						checkpoint_message = handle_requests.CreateCheckpointMessage(self.NodeId, self.log, self.private_key)
-						communication.Multicast('224.1.1.1', 8766, checkpoint_message)
-						self.ChangeMode('Checkpoint')
+					# if len(self.log.log) >= 2:
+					# 	print(f"CHECKPOINTING, messages = {len(self.log.log)}")
+					# 	# if more than 5 messages in message log, flush it!
+					# 	checkpoint_message = handle_requests.CreateCheckpointMessage(self.NodeId, self.log, self.private_key)
+					# 	communication.Multicast('224.1.1.1', 8766, checkpoint_message)
+					# 	self.ChangeMode('Checkpoint')
 
 					# # # View change
 					if len(self.log.log) >= 1 and self.mode != 'Checkpoint':
-						print(f"VIEW Change, messages = {len(self.log.log)}")
+						# print(f"VIEW Change, messages = {len(self.log.log)}")
 
 						view_change_message = handle_requests.CreateViewChangeMessage(self.ckpt_log, 
 														self.log, self.view, self.NodeId, 
 														self.private_key)
-						print(view_change_message)
+						# print(view_change_message)
 						communication.Multicast('224.1.1.1', 8766, view_change_message)
-						print("multicasted")
+						# print("multicasted")
 						self.ChangeMode('View-Change')
-						print('mode changed')
+						# print('mode changed')
 
 					# print("Neither Checkpoint nor View change")
 
@@ -388,16 +350,11 @@ class Node(object):
 
 			elif message['type'].upper() == 'VIEW-CHANGE':
 				if handle_requests.VerifyViewChange(message, self.ListOfNodes):
-					print(f"{self.NodeId} -> Inside frist IF")
 					self.view_change_log.AddViewChangeMessage(message)
-					# flush logs
-					print(f"{self.NodeId} -> Num of view change msgs = {self.view_change_log.NumMessages()}")
 
 					if self.view_change_log.NumMessages() >= 2*self.total_allocated//3 and self.mode == 'View-Change':
-						print(f"{self.NodeId} -> Inside second IF")
-
 						# # # if new primary, tell everyone that view change successful!
-						print(f"View = {self.view}, check = {int(self.view)+1} % {self.total_allocated} == {int(self.NodeId)}")
+						# print(f"View = {self.view}, check = {int(self.view)+1} % {self.total_allocated} == {int(self.NodeId)}")
 						if ((int(self.view)+1) % self.total_allocated) == int(self.NodeId):
 							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view+1}! I am telling everyone to finish changing view?")
 							new_view_message = handle_requests.CreateNewViewMessage(self.view, self.view_change_log, self.private_key)
