@@ -29,8 +29,10 @@ import report
 # Dynamic Address resolution for Flask server and NameScheduler
 from config import config
 
-
-
+# for the timer
+TIMER_WAITING_TIME = 2
+MULTICAST_SERVER_IP = '224.1.1.1'
+MULTICAST_SERVER_PORT = 8766
 
 class Node(object):
 	"""docstring for Node"""
@@ -58,6 +60,7 @@ class Node(object):
 
 		self.total_allocated = 0
 		self.faults = {'malicious': False, 'reboot': False, 'netdelay': False, 'benign':True}
+		self.timer = threading.Timer(30, print) #print is random, just for the sake of initialisation
 		"""
 		self.ListOfNodes = {'NodeID': {uska details}}
 		
@@ -88,16 +91,6 @@ class Node(object):
 				) 
 				+ ["no IP found"]
 			   )[0]
-
-	# def NumberOfAllocated(self, ConnectedClients):
-	# 	count = 0
-	# 	debug = 0
-	# 	for key, value in ConnectedClients.items():
-	# 		debug += 1
-	# 		if value['allocate']:
-	# 			count += 1
-	# 	print(f"debug = {debug}")
-	# 	return count
 
 
 	def IsPrimary(self):
@@ -150,6 +143,15 @@ class Node(object):
 				self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
 
 	
+	def InitiateViewChange(self):
+		# # # View change
+		view_change_message = handle_requests.CreateViewChangeMessage(self.ckpt_log,
+													self.log, self.view, self.NodeId,
+													self.private_key)
+		# print(view_change_message)
+		communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, view_change_message)
+		self.ChangeMode('View-Change')
+
 
 	async def RunRoutine(self, websocket, path):
 		# Defines the funcioning of each node on receiving differnet messages
@@ -160,8 +162,8 @@ class Node(object):
 			message = json.loads(message)
 
 			# # # ID = 3 is faulty for testing
-			# if int(self.NodeId) == 2:
-			# 	return
+			if int(self.NodeId) % 3 == 1:
+				return
 			
 			# # # We enter 'View-Change' mode when some error is detected. So no messages except VIEW-CHANGE are accepted
 			if message['type'].upper() not in ['VIEW-CHANGE', 'NEW-VIEW'] and self.mode == 'View-Change':
@@ -182,7 +184,7 @@ class Node(object):
 				self.log.flush()
 				self.ckpt_log.flush()
 				self.view_change_log.flush()
-				self.view = 0
+				self.view = 1
 				self.total_allocated = message['total']
 				self.SendStatusUpdate('allocated')
 				# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'allocated'})
@@ -240,7 +242,7 @@ class Node(object):
 					
 					if final_message is not None:
 						# # # sign on message verified: Multicast the request all nodes in the network
-						communication.Multicast('224.1.1.1', 8766, final_message, self.faults)
+						communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, final_message, self.faults)
 					else:
 						# # # Client did not verify
 						print(f"{self.NodeId} -> The message verification failed")
@@ -249,10 +251,16 @@ class Node(object):
 					# # # Node is not primary. Send the message to the actual 
 					print(f"Well I am NOT the primary with ID = {self.NodeId} in view {self.view}. I shall forward it to the required owner!")
 					await communication.SendMsgRoutine(self.ListOfNodes[str(int(self.view) % self.total_allocated)]['Uri'], message)
+					self.timer = threading.Timer(TIMER_WAITING_TIME, self.InitiateViewChange)
+					self.timer.start()
 
 
 			# # # PREPREPARE
 			elif message['type'].upper() == 'PREPREPARE' and self.mode == 'Sleep':
+				#if some temporary fault happened and timer was started
+				if self.timer.is_alive():
+					print(f"ID = {self.NodeId}, primary={self.IsPrimary()}. Closing the timer!")
+					self.timer.cancel()
 				print(f"ID = {self.NodeId}, primary={self.IsPrimary()}. Starting PREPREPARE.")
 				# print(message)
 				public_key_primary = self.ListOfNodes[str(self.view % self.total_allocated)]['public_key']
@@ -270,7 +278,7 @@ class Node(object):
 					# print(f"{self.NodeId} -> self Prepare logging...")
 					self.log.AddPrepare(result)
 					# print(f"{self.NodeId} -> self Prepare logged")
-					communication.Multicast('224.1.1.1', 8766, result, self.faults)
+					communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, result, self.faults)
 
 			
 			# # # PREPARE
@@ -292,7 +300,7 @@ class Node(object):
 					if self.mode == 'Prepare':
 						commit = handle_requests.CreateCommit(message, self.NodeId, self.private_key)
 						self.ChangeMode("Commit")
-						communication.Multicast('224.1.1.1', 8766, commit, self.faults)
+						communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, commit, self.faults)
 
 			elif message['type'].upper() == 'COMMIT':
 				verify_p, cToken = handle_requests.Prepare(message, self.ListOfNodes, self.view)
@@ -314,25 +322,8 @@ class Node(object):
 					# 	print(f"CHECKPOINTING, messages = {len(self.log.log)}")
 					# 	# if more than 5 messages in message log, flush it!
 					# 	checkpoint_message = handle_requests.CreateCheckpointMessage(self.NodeId, self.log, self.private_key)
-					# 	communication.Multicast('224.1.1.1', 8766, checkpoint_message)
+					# 	communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, checkpoint_message)
 					# 	self.ChangeMode('Checkpoint')
-
-					# # # View change
-					if len(self.log.log) >= 1 and self.mode != 'Checkpoint':
-						# print(f"VIEW Change, messages = {len(self.log.log)}")
-
-						view_change_message = handle_requests.CreateViewChangeMessage(self.ckpt_log, 
-														self.log, self.view, self.NodeId, 
-														self.private_key)
-						# print(view_change_message)
-						communication.Multicast('224.1.1.1', 8766, view_change_message)
-						# print("multicasted")
-						self.ChangeMode('View-Change')
-						# print('mode changed')
-
-					# print("Neither Checkpoint nor View change")
-
-
 
 
 			elif message['type'].upper() == 'CHECKPOINT':
@@ -360,7 +351,7 @@ class Node(object):
 						if ((int(self.view)+1) % self.total_allocated) == int(self.NodeId):
 							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view+1}! I am telling everyone to finish changing view?")
 							new_view_message = handle_requests.CreateNewViewMessage(self.view, self.view_change_log, self.private_key)
-							communication.Multicast('224.1.1.1', 8766, new_view_message)
+							communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, new_view_message)
 
 				else:
 					print(f"{self.NodeId} -> Verification of ViewChange failed")
@@ -389,7 +380,7 @@ class Node(object):
 			self.HandShake(self.NameSchedulerURI)
 
 		# MultiCastServer definition is in communication.py
-		t1 = threading.Thread(target=communication.MulticastServer, args=('224.1.1.1', 8766, self))
+		t1 = threading.Thread(target=communication.MulticastServer, args=(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, self))
 		t1.start()
 
 		asyncio.get_event_loop().run_until_complete(
