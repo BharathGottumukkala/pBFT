@@ -11,6 +11,7 @@ from netifaces import interfaces, ifaddresses, AF_INET
 
 import report
 from config import config
+import messaging
 
 
 def GetLocalIp():
@@ -40,6 +41,32 @@ def UpdateNodeDetails(NameSchedulerURI):
 	except Exception as e:
 		# If exception occurs, NameScheduler is offilne. Nothing to update
 		return
+
+
+async def TimeoutRoutine(time, caller, token, reply, ConnectedClients):
+	print(f"{caller} about to sleep for {time} seconds")
+	await asyncio.sleep(time)
+	print(f"I woke up. What did I miss?")
+
+	print(reply)
+	if messaging.jwt().get_payload(token)['t'] in reply:
+		print(f"{caller} got the reply. Everything seems fine")
+	else:
+		print(f"{caller} didnt get the reply yet. Something is fishy")
+		print(f"{caller} will send request to all nodes.")
+		Multicast('224.1.1.1', 8766, {'token': token, 'type': 'Request'})
+
+	# if caller == 'client':
+		# Client wants to send back this message as a BroadCast to everybody
+
+
+
+def Timeout(time, caller, token, reply, ConnectedClients):
+	loop = asyncio.new_event_loop()
+	asyncio.set_event_loop(loop)
+	asyncio.get_event_loop().run_until_complete(asyncio.wait([   
+	   TimeoutRoutine(time, caller, token, reply, ConnectedClients)
+	]))
 
 
 
@@ -146,6 +173,7 @@ def MulticastServer(MCAST_GRP, MCAST_PORT, node):
 		data = sock.recv(50240)
 		# print(data)
 		data = json.loads(data)
+		print(data['type'])
 
 		# if data['type'] == 'Allocate':
 		# 	node.ListOfNodes[node.NodeId]['allocate'] = True

@@ -30,6 +30,8 @@ import report
 from config import config
 
 
+
+
 class Node(object):
 	"""docstring for Node"""
 	def __init__(self, port):

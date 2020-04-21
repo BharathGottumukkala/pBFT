@@ -14,6 +14,7 @@ import communication
 import messaging
 import sign
 from config import config
+# import timeout
 
 
 # initialize Flask
@@ -39,6 +40,8 @@ public, private = sign.GenerateKeys(2048)
 public, private = public.exportKey('PEM'), private.exportKey('PEM')
 
 mode = "Emulab"
+
+# recieve_reply = False
 
 
 # def Primary(ConnectedClients):
@@ -123,9 +126,14 @@ def interactive():
 
 	message = {"o": oper,"args": {"num1": num1, "num2": num2}, "t": int(time.time()), "c": 1234567}
 	message = messaging.jwt(json=message, header={"alg": "RSA"}, key=private)
-	message = message.get_token()
-	t1 = threading.Thread(target=communication.SendMsg, args=(primary, json.dumps({'token': message, 'type': 'Request'})))
+	token = message.get_token()
+	t1 = threading.Thread(target=communication.SendMsg, args=(primary, json.dumps({'token': token, 'type': 'Request'})))
 	t1.start()
+
+	print(reply)
+	t1 = threading.Thread(target=communication.Timeout, args=(5, 'client', token, reply, ConnectedClients))
+	t1.start()
+	# communication.Timeout(10, 'client', message, reply)
 	# communication.SendMsg(primary, json.dumps({'token': message, 'type': 'Request'}))
 	# reply = await SendMsg(primary['Uri'], message)
 	# return render_template('interactive.html')
