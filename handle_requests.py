@@ -156,8 +156,9 @@ def CreateViewChangeMessage(checkpoint_log, message_log, v, i, private_key):
 	'''
 	for d in m:
 		P[d] = {}
-		P[d]['preprepare'] = m[d]['preprepare']
-		P[d]['prepare'] = m[d]['prepare']
+		# # # Message getting too big with this. Removing for a while
+		# P[d]['preprepare'] = m[d]['preprepare']
+		# P[d]['prepare'] = m[d]['prepare']
 	# print(P)
 
 	view_change_message = {'v': v+1, 'n': n, 'C': C, 'P': P, 'i': i}
