@@ -140,7 +140,7 @@ def Multicast(MCAST_GRP, MCAST_PORT, msg, faults=None):
 			# Implement after deciding what to implement
 			pass
 		elif faults['reboot']:
-			time.sleep(5)
+			time.sleep(7)
 			# Have to reinitialize node properties
 			# Dont send msg
 		elif faults['netdelay']:

@@ -30,7 +30,7 @@ import report
 from config import config
 
 # for the timer
-TIMER_WAITING_TIME = 2
+TIMER_WAITING_TIME = 5
 MULTICAST_SERVER_IP = '224.1.1.1'
 MULTICAST_SERVER_PORT = 8766
 
@@ -144,6 +144,7 @@ class Node(object):
 
 	
 	def InitiateViewChange(self):
+		print(f"{self.NodeId} -> Timer ran out")
 		# # # View change
 		view_change_message = handle_requests.CreateViewChangeMessage(self.ckpt_log,
 													self.log, self.view, self.NodeId,
@@ -161,14 +162,9 @@ class Node(object):
 			# token is generated using messaging library in handle_requests
 			message = json.loads(message)
 
-			# # # ID = 3 is faulty for testing
-			if int(self.NodeId) % 3 == 1:
-				return
 			
-			# # # We enter 'View-Change' mode when some error is detected. So no messages except VIEW-CHANGE are accepted
-			if message['type'].upper() not in ['VIEW-CHANGE', 'NEW-VIEW'] and self.mode == 'View-Change':
-				return #dont do anything, there is something wrong with the distributed system!
-
+			
+			
 
 			# # # When a new node is added, Register the nde's details for future communication
 			if message['type'].upper() == 'NEWNODE':
@@ -198,6 +194,7 @@ class Node(object):
 				self.view_change_log.flush()
 				self.view = 0
 				self.total_allocated = message['total']
+				self.mode = 'Sleep'
 				self.SendStatusUpdate('deallocated')
 				# report.Report(self.client_uri, 'status', {
 				#               'id': self.NodeId, 'status': 'deallocated'})
@@ -209,6 +206,15 @@ class Node(object):
 					self.faults[fault] = value
 				print(f"{self.NodeId} -> Modified Fault parameters")
 				print(self.faults)
+
+			elif message['type'].upper() == 'DEBUG':
+				report.Report(self.client_uri, 'debug', {'id': self.NodeId, 'view':self.view})
+
+
+			# # # We enter 'View-Change' mode when some error is detected. So no messages except VIEW-CHANGE are accepted
+			elif message['type'].upper() not in ['VIEW-CHANGE', 'NEW-VIEW'] and self.mode == 'View-Change':
+				return #dont do anything, there is something wrong with the distributed system!
+
 
 
 
@@ -224,6 +230,11 @@ class Node(object):
 				# # # Added here so that it goes unnoticed in the startup process of emulab
 				if self.IsPrimary():
 					report.Report(self.client_uri, 'status', {'test': 'All the best'})
+
+
+			# # # ID = 3 is faulty for testing
+			# elif int(self.NodeId) % 3 == 1:
+			# 	return
 
 
 			# # # Request recieved from client
@@ -251,6 +262,7 @@ class Node(object):
 					# # # Node is not primary. Send the message to the actual 
 					print(f"Well I am NOT the primary with ID = {self.NodeId} in view {self.view}. I shall forward it to the required owner!")
 					await communication.SendMsgRoutine(self.ListOfNodes[str(int(self.view) % self.total_allocated)]['Uri'], message)
+					self.SendStatusUpdate("request")
 					self.timer = threading.Timer(TIMER_WAITING_TIME, self.InitiateViewChange)
 					self.timer.start()
 

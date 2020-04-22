@@ -131,8 +131,8 @@ def interactive():
 	t1.start()
 
 	print(reply)
-	t1 = threading.Thread(target=communication.Timeout, args=(5, 'client', token, reply, ConnectedClients))
-	t1.start()
+	t2 = threading.Thread(target=communication.Timeout, args=(5, 'client', token, reply, ConnectedClients))
+	t2.start()
 	# communication.Timeout(10, 'client', message, reply)
 	# communication.SendMsg(primary, json.dumps({'token': message, 'type': 'Request'}))
 	# reply = await SendMsg(primary['Uri'], message)
@@ -237,6 +237,19 @@ def on_faults(data):
 	data['type'] = "ModifyFault"
 	t1 = threading.Thread(target=communication.SendMsg, args=(ConnectedClients[data['id']]['Uri'], data))
 	t1.start()
+
+
+@socketio.on('debug')
+def on_debug(data):
+	if not 'view' in data:
+		print(f"Debug Node {data['id']}")
+		data['type'] = "Debug"
+		t1 = threading.Thread(target=communication.SendMsg, args=(ConnectedClients[data['id']]['Uri'], data))
+		t1.start()
+
+	else:
+		socketio.emit('debug', data)
+
 
 
 
