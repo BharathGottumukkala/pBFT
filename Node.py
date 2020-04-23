@@ -143,8 +143,12 @@ class Node(object):
 				self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
 
 	
-	def InitiateViewChange(self):
-		print(f"{self.NodeId} -> Timer ran out")
+	def InitiateViewChange(self, message):
+		if handle_requests.digest(message) in self.log.log:
+			print(f"{self.NodeId} -> Timer ran out. But primary replied. Phew!!")
+			return
+
+		print(f"{self.NodeId} -> Timer ran out without the primary replying!")
 		# # # View change
 		view_change_message = handle_requests.CreateViewChangeMessage(self.ckpt_log,
 													self.log, self.view, self.NodeId,
@@ -164,6 +168,9 @@ class Node(object):
 
 			
 			
+			# # # REBOOT NODE doesnt reply
+			if int(self.faults['reboot']):
+				return
 			
 
 			# # # When a new node is added, Register the nde's details for future communication
@@ -180,7 +187,7 @@ class Node(object):
 				self.log.flush()
 				self.ckpt_log.flush()
 				self.view_change_log.flush()
-				self.view = 1
+				self.view = 0
 				self.total_allocated = message['total']
 				self.SendStatusUpdate('allocated')
 				# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'allocated'})
@@ -232,9 +239,6 @@ class Node(object):
 					report.Report(self.client_uri, 'status', {'test': 'All the best'})
 
 
-			# # # ID = 3 is faulty for testing
-			# elif int(self.NodeId) % 3 == 1:
-			# 	return
 
 
 			# # # Request recieved from client
@@ -251,6 +255,13 @@ class Node(object):
 					# # # Verify client's sign and returns the next message to send
 					final_message = handle_requests.Request(message, self.client_public_key, self.view, seq_num, self.private_key)
 					
+					# # # verify we have not already recieved this request
+					if self.log.HasDigestEntry(final_message):
+						print(f"{self.NodeId} -> I ALREADY HAVE THIS MESSAGE IN MY LOG BROTHA!")
+						return
+					# # # if not, add it to logs (note: This will only work for primary)
+					self.log.AddPrePrepare(final_message)
+
 					if final_message is not None:
 						# # # sign on message verified: Multicast the request all nodes in the network
 						communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, final_message, self.faults)
@@ -263,17 +274,12 @@ class Node(object):
 					print(f"Well I am NOT the primary with ID = {self.NodeId} in view {self.view}. I shall forward it to the required owner!")
 					await communication.SendMsgRoutine(self.ListOfNodes[str(int(self.view) % self.total_allocated)]['Uri'], message)
 					self.SendStatusUpdate("request")
-					self.timer = threading.Timer(TIMER_WAITING_TIME, self.InitiateViewChange)
+					self.timer = threading.Timer(TIMER_WAITING_TIME, self.InitiateViewChange, [message])
 					self.timer.start()
 
 
 			# # # PREPREPARE
 			elif message['type'].upper() == 'PREPREPARE' and self.mode == 'Sleep':
-				#if some temporary fault happened and timer was started
-				if self.timer.is_alive():
-					print(f"ID = {self.NodeId}, primary={self.IsPrimary()}. Closing the timer!")
-					self.timer.cancel()
-				print(f"ID = {self.NodeId}, primary={self.IsPrimary()}. Starting PREPREPARE.")
 				# print(message)
 				public_key_primary = self.ListOfNodes[str(self.view % self.total_allocated)]['public_key']
 

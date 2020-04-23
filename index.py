@@ -205,7 +205,7 @@ def on_log(data):
 
 @socketio.on('reply')
 def on_reply(data):
-	global reply
+	global reply, view
 	print(data)
 	jwt = messaging.jwt()
 	token = jwt.get_payload(data['token'])
@@ -219,15 +219,24 @@ def on_reply(data):
 	print(f"Count = {reply[token['t']]['count']}")
 	if reply[token['t']]['count'] >= (len(ConnectedClients)//3) + 1:
 		view = reply[token['t']]['view']
-		print("Socket emiting")
+		print("Socket emiting. view:", view)
 		socketio.emit('Reply', {'reply': reply[token['t']]['r'] })
-		print("Socket emited")
+		print("Socket emited. view:", view)
 
 
 @socketio.on('status')
 def on_status(data):
+	global view, view_change
 	print("In status")
 	print(f'status received {data}')
+	# if data['view'] != view:
+	# 	if data['view'] not in view_change:
+	# 		view_change[data['view']] = 1
+	# 	else:
+	# 		view_change[data['view']] += 1
+	# 		if view_change[data['view']] >= (len(ConnectedClients)//3) + 1:
+	# 			view = data['view']
+	# 			view_change = {}
 	socketio.emit('status', data)
 
 

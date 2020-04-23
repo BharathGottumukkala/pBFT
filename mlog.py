@@ -19,6 +19,11 @@ class MessageLog:
 	def IsEmpty(self):
 		return self.log == {}
 
+	def HasDigestEntry(self, message):
+		jwt = messaging.jwt()
+		payload = jwt.get_payload(message['token'])
+		return payload['d'] in self.log
+
 	def flush(self):
 		self.log = {}
 
@@ -29,6 +34,8 @@ class MessageLog:
 		return self.log[message['d']]
 
 	def AddPrePrepare(self, message):
+		if self.HasDigestEntry(message):
+			return
 		jwt = messaging.jwt()
 		preprepare = jwt.get_payload(message['token'])
 		m = jwt.get_payload(message['m']['token'])
