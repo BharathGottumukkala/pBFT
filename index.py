@@ -259,6 +259,13 @@ def on_debug(data):
 	else:
 		socketio.emit('debug', data)
 
+@socketio.on('ForceViewChange')
+def on_forced_view_change(data):
+	print("Forced View  Change Initiated")
+
+	# Do Something wth it
+
+
 
 
 

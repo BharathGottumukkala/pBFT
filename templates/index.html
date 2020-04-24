@@ -442,8 +442,10 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div style="font-size: 120%" class="text-xs font-weight-bold text-warning text-uppercase mb-1">Faulty Nodes</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ nodes_info["faulty"] }}</div>
+                      <div style="font-size: 120%" class="text-xs font-weight-bold text-warning text-uppercase mb-1">Client Stats</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">
+                        <input type="button" class="btn btn-primary" style="float: right;" id="force_view_change" value="Change View">
+                      </div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -1254,6 +1256,13 @@
     //     $('#add_form').hide();
       
     // });
+
+    $('#force_view_change').click(function (e) {
+      console.log('Forcing view changr');
+      // var value = $('#allocate').val();
+
+      socket.emit('ForceViewChange', {});
+    });
 
 
     $('#btnalloc').click(function (e) {
