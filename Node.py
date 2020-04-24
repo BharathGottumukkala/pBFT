@@ -59,7 +59,25 @@ class Node(object):
 		self.view_change_log = mlog.ViewChangeLog()
 
 		self.total_allocated = 0
-		self.faults = {'malicious': False, 'reboot': False, 'netdelay': False, 'benign':True}
+		"""
+		{InCorrectReplay: InCorrectReplay,
+         ModifyOperands: ModifyOperands, 
+         FakeViewChange: FakeViewChange, 
+         ReplayAttack: ReplayAttack, 
+         Crash: Crash, 
+         NetworkDelay: NetworkDelay, 
+         Benign: Benign}
+		
+		"""
+		self.faults = {'InCorrectReply': False,
+					   'ModifyOperands': False, 
+					   'FakeViewChange': False, 
+					   'ReplayAttack': False,  
+					   'Crash': False, 
+					   'NetworkDelay': False, 
+					   'TimeDelay': 0,
+					   'Benign':True}
+
 		self.timer = threading.Timer(30, print) #print is random, just for the sake of initialisation
 		"""
 		self.ListOfNodes = {'NodeID': {uska details}}
@@ -170,7 +188,7 @@ class Node(object):
 			
 			
 			# # # REBOOT NODE doesnt reply
-			if int(self.faults['reboot']):
+			if int(self.faults['Crash']):
 				return
 			
 
@@ -208,10 +226,16 @@ class Node(object):
 				#               'id': self.NodeId, 'status': 'deallocated'})
 
 			elif message['type'].upper() == 'MODIFYFAULT':
+				# # # Update the config file with the delay
+				# config().UpdateAddress(message['id'], message['TimeDelay'].split()[0])
 				del message['id']
 				del message['type']
 				for fault, value in message.items():
-					self.faults[fault] = value
+					if fault == 'TimeDelay':
+						self.faults[fault] = value.split()[0]
+					else:
+						self.faults[fault] = value
+
 				print(f"{self.NodeId} -> Modified Fault parameters")
 				print(self.faults)
 

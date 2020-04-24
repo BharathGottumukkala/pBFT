@@ -20,6 +20,8 @@
 
   <!-- Custom styles for this template-->
   <link href="../static/css/temp/sb-admin-2.min.css" rel="stylesheet">
+  <!-- <link href="../static/css/elements.css" rel="stylesheet">
+  <script src="../static/js/popup_js.js"></script> -->
   <!-- Bootstrap core JavaScript-->
   <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
@@ -350,6 +352,7 @@
           </div> -->
 
           <!-- Content Row -->
+          
           <div class="row">
 
             <!-- Earnings (Monthly) Card Example -->
@@ -444,13 +447,23 @@
                     <div class="col mr-2">
                       <div style="font-size: 120%" class="text-xs font-weight-bold text-warning text-uppercase mb-1">Client Stats</div>
                       <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <input type="button" class="btn btn-primary" style="float: right;" id="force_view_change" value="Change View">
+                        <div>
+                          <span id="client_view">
+                            Client View: 0
+                          </span><br><br>
+                          <span id="reply_count">
+                            Replies: 0
+                          </span>
+                          
+                        
+                        </div>
                       </div>
                     </div>
-                    <div class="col-auto">
+                    <!-- <div class="col-auto">
                       <i class="fas fa-comments fa-2x text-gray-300"></i>
-                    </div>
+                    </div> -->
                   </div>
+
                 </div>
               </div>
             </div>
@@ -466,85 +479,105 @@
               <!-- Project Card Example -->
               <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Status of Allocated Nodes</h6>
+                  <span class="m-0 font-weight-bold text-primary">Status of Allocated Nodes</span>
+                  <input type="button" class="btn btn-primary" style="float: right;" id="force_view_change" value="Change View">
                 </div>
                 <div class="card-body">
-                  <h4 id="0_text" style="font-size: 110%;" class="small font-weight-bold">Node Id 0 <span id="0_view" class="float-right">20%</span></h4>
+                  <h4 id="0_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="0_next" style="float: left;">Node Id 0</span> <span>Fault Status: <span id="0_fault_status">Benign</span></span> <span id="0_view" style="float: right">View: 0</span></h4>
                   <div id="0_bar" class="progress mb-4">
                     <div class="progress-bar bg-success w3-center" id="0_progress" role="progressbar" style="width: 0%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="1_text" style="font-size: 110%" class="small font-weight-bold">Node Id 1 <span id="1_view" class="float-right">40%</span></h4>
+
+                  <h4 id="1_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="1_next" style="float: left;">Node Id 1</span> <span>Fault Status: <span id="1_fault_status">Benign</span></span> <span id="1_view" style="float: right">View: 0</span></h4>
                   <div id="1_bar" class="progress mb-4">
-                    <div  id="1_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="1_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="2_text" style="font-size: 110%" class="small font-weight-bold">Node Id 2 <span id="2_view" class="float-right">40%</span></h4>
+
+                  <h4 id="2_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="2_next" style="float: left;">Node Id 2</span> <span>Fault Status: <span id="2_fault_status">Benign</span></span> <span id="2_view" style="float: right">View: 0</span></h4>
                   <div id="2_bar" class="progress mb-4">
-                    <div  id="2_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="2_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="3_text" style="font-size: 110%" class="small font-weight-bold">Node Id 3 <span id="3_view" class="float-right">40%</span></h4>
+
+                  <h4 id="3_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="3_next" style="float: left;">Node Id 3</span> <span>Fault Status: <span id="3_fault_status">Benign</span></span> <span id="3_view" style="float: right">View: 0</span></h4>
                   <div id="3_bar" class="progress mb-4">
-                    <div  id="3_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="3_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="4_text" style="font-size: 110%" class="small font-weight-bold">Node Id 4 <span id="4_view" class="float-right">40%</span></h4>
+
+                  <h4 id="4_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="4_next" style="float: left;">Node Id 4</span> <span>Fault Status: <span id="4_fault_status">Benign</span></span> <span id="4_view" style="float: right">View: 0</span></h4>
                   <div id="4_bar" class="progress mb-4">
-                    <div  id="4_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="4_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="5_text" style="font-size: 110%" class="small font-weight-bold">Node Id 5 <span id="5_view" class="float-right">40%</span></h4>
+
+                  <h4 id="5_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="5_next" style="float: left;">Node Id 5</span> <span>Fault Status: <span id="5_fault_status">Benign</span></span> <span id="5_view" style="float: right">View: 0</span></h4>
                   <div id="5_bar" class="progress mb-4">
-                    <div  id="5_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="5_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="6_text" style="font-size: 110%" class="small font-weight-bold">Node Id 6 <span id="6_view" class="float-right">40%</span></h4>
+
+                  <h4 id="6_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="6_next" style="float: left;">Node Id 6</span> <span>Fault Status: <span id="6_fault_status">Benign</span></span> <span id="6_view" style="float: right">View: 0</span></h4>
                   <div id="6_bar" class="progress mb-4">
-                    <div  id="6_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="6_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="7_text" style="font-size: 110%" class="small font-weight-bold">Node Id 7 <span id="7_view" class="float-right">40%</span></h4>
+
+                  <h4 id="7_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="7_next" style="float: left;">Node Id 7</span> <span>Fault Status: <span id="7_fault_status">Benign</span></span> <span id="7_view" style="float: right">View: 0</span></h4>
                   <div id="7_bar" class="progress mb-4">
-                    <div  id="7_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="7_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="8_text" style="font-size: 110%" class="small font-weight-bold">Node Id 8 <span id="8_view" class="float-right">40%</span></h4>
+
+                  <h4 id="8_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="8_next" style="float: left;">Node Id 8</span> <span>Fault Status: <span id="8_fault_status">Benign</span></span> <span id="8_view" style="float: right">View: 0</span></h4>
                   <div id="8_bar" class="progress mb-4">
-                    <div  id="8_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="8_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="9_text" style="font-size: 110%" class="small font-weight-bold">Node Id 9 <span id="9_view" class="float-right">40%</span></h4>
+
+                  <h4 id="9_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="9_next" style="float: left;">Node Id 9</span> <span>Fault Status: <span id="9_fault_status">Benign</span></span> <span id="9_view" style="float: right">View: 0</span></h4>
                   <div id="9_bar" class="progress mb-4">
-                    <div  id="9_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="9_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="10_text" style="font-size: 110%" class="small font-weight-bold">Node Id 10 <span id="10_view" class="float-right">40%</span></h4>
+
+                  <h4 id="10_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="10_next" style="float: left;">Node Id 10</span> <span>Fault Status: <span id="10_fault_status">Benign</span></span> <span id="10_view" style="float: right">View: 0</span></h4>
                   <div id="10_bar" class="progress mb-4">
-                    <div  id="10_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="10_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="11_text" style="font-size: 110%" class="small font-weight-bold">Node Id 11 <span id="11_view" class="float-right">40%</span></h4>
+
+                  <h4 id="11_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="11_next" style="float: left;">Node Id 11</span> <span>Fault Status: <span id="11_fault_status">Benign</span></span> <span id="11_view" style="float: right">View: 0</span></h4>
                   <div id="11_bar" class="progress mb-4">
-                    <div  id="11_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="11_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="12_text" style="font-size: 110%" class="small font-weight-bold">Node Id 12 <span id="12_view" class="float-right">40%</span></h4>
+
+                  <h4 id="12_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="12_next" style="float: left;">Node Id 12</span> <span>Fault Status: <span id="12_fault_status">Benign</span></span> <span id="12_view" style="float: right">View: 0</span></h4>
                   <div id="12_bar" class="progress mb-4">
-                    <div  id="12_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="12_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="13_text" style="font-size: 110%" class="small font-weight-bold">Node Id 13 <span id="13_view" class="float-right">40%</span></h4>
+
+                  <h4 id="13_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="13_next" style="float: left;">Node Id 13</span> <span>Fault Status: <span id="13_fault_status">Benign</span></span> <span id="13_view" style="float: right">View: 0</span></h4>
                   <div id="13_bar" class="progress mb-4">
-                    <div  id="13_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="13_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="14_text" style="font-size: 110%" class="small font-weight-bold">Node Id 14 <span id="14_view" class="float-right">40%</span></h4>
+
+                  <h4 id="14_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="14_next" style="float: left;">Node Id 14</span> <span>Fault Status: <span id="14_fault_status">Benign</span></span> <span id="14_view" style="float: right">View: 0</span></h4>
                   <div id="14_bar" class="progress mb-4">
-                    <div  id="14_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="14_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="15_text" style="font-size: 110%" class="small font-weight-bold">Node Id 15 <span id="15_view" class="float-right">40%</span></h4>
+
+                  <h4 id="15_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="15_next" style="float: left;">Node Id 15</span> <span>Fault Status: <span id="15_fault_status">Benign</span></span> <span id="15_view" style="float: right">View: 0</span></h4>
                   <div id="15_bar" class="progress mb-4">
-                    <div  id="15_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="15_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="16_text" style="font-size: 110%" class="small font-weight-bold">Node Id 16 <span id="16_view" class="float-right">40%</span></h4>
+
+                  <h4 id="16_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="16_next" style="float: left;">Node Id 16</span> <span>Fault Status: <span id="16_fault_status">Benign</span></span> <span id="16_view" style="float: right">View: 0</span></h4>
                   <div id="16_bar" class="progress mb-4">
-                    <div  id="16_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="16_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="17_text" style="font-size: 110%" class="small font-weight-bold">Node Id 17 <span id="17_view" class="float-right">40%</span></h4>
+
+                  <h4 id="17_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="17_next" style="float: left;">Node Id 17</span> <span>Fault Status: <span id="17_fault_status">Benign</span></span> <span id="17_view" style="float: right">View: 0</span></h4>
                   <div id="17_bar" class="progress mb-4">
-                    <div  id="17_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="17_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <h4 id="18_text" style="font-size: 110%" class="small font-weight-bold">Node Id 18 <span id="18_view" class="float-right">40%</span></h4>
+
+                  <h4 id="18_text" style="font-size: 110%; text-align: center;" class="small font-weight-bold"><span id="18_next" style="float: left;">Node Id 18</span> <span>Fault Status: <span id="18_fault_status">Benign</span></span> <span id="18_view" style="float: right">View: 0</span></h4>
                   <div id="18_bar" class="progress mb-4">
-                    <div  id="18_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success w3-center" id="18_progress" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
+
                 </div>
               </div>
             </div>
@@ -562,21 +595,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="0_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
                             Node Id 0
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="0_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="0_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="0_malicious" class="dropdown-item" href="#">Malicious
-                              <form>
-                                <input type="text" id="0_malicious_data">
-                              </form>
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="0_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="0_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="0_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="0_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="0_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="0_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="0_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="0_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="0_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="0_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -589,18 +631,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="1_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
                             Node Id 1
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="1_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="1_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="1_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="1_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="1_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="1_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="1_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="1_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="1_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="1_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="1_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="1_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="1_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -613,18 +667,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="2_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
                             Node Id 2
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="2_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="2_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="2_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="2_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="2_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="2_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="2_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="2_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="2_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="2_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="2_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="2_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="2_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -637,18 +703,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="3_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
                             Node Id 3
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="3_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="3_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="3_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="3_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="3_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="3_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="3_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="3_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="3_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="3_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="3_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="3_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="3_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -661,18 +739,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="4_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
                             Node Id 4
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="4_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="4_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="4_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="4_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="4_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="4_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="4_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="4_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="4_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="4_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="4_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="4_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="4_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -685,18 +775,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="5_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i> -->
                             Node Id 5
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="5_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="5_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="5_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="5_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="5_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="5_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="5_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="5_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="5_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="5_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="5_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="5_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="5_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -710,18 +812,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="6_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-600"></i> -->
                             Node Id 6
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="6_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="6_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="6_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="6_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="6_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="6_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="6_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="6_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="6_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="6_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="6_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="6_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="6_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -735,18 +849,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="7_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-700"></i> -->
                             Node Id 7
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="7_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="7_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="7_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="7_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="7_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="7_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="7_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="7_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="7_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="7_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="7_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="7_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="7_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -760,18 +886,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="8_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-800"></i> -->
                             Node Id 8
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="8_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="8_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="8_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="8_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="8_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="8_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="8_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="8_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="8_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="8_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="8_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="8_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="8_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -785,18 +923,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="9_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-900"></i> -->
                             Node Id 9
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="9_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="9_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="9_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="9_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="9_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="9_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="9_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="9_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="9_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="9_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="9_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="9_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="9_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -810,18 +960,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="10_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1000"></i> -->
                             Node Id 10
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="10_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="10_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="10_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="10_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="10_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="10_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="10_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="10_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="10_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="10_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="10_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="10_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="10_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -835,18 +997,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="11_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1100"></i> -->
                             Node Id 11
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="11_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="11_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="11_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="11_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="11_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="11_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="11_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="11_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="11_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="11_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="11_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="11_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="11_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -860,18 +1034,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="12_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1200"></i> -->
                             Node Id 12
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="12_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="12_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="12_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="12_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="12_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="12_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="12_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="12_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="12_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="12_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="12_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="12_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="12_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -885,18 +1071,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="13_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1300"></i> -->
                             Node Id 13
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="13_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="13_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="13_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="13_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="13_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="13_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="13_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="13_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="13_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="13_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="13_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="13_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="13_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -910,18 +1108,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="14_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1400"></i> -->
                             Node Id 14
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="14_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="14_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="14_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="14_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="14_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="14_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="14_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="14_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="14_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="14_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="14_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="14_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="14_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -935,18 +1145,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="15_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1500"></i> -->
                             Node Id 15
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="15_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="15_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="15_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="15_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="15_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="15_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="15_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="15_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="15_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="15_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="15_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="15_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="15_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -960,18 +1182,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="16_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1600"></i> -->
                             Node Id 16
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="16_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="16_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="16_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="16_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="16_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="16_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="16_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="16_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="16_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="16_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="16_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="16_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="16_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -985,18 +1219,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="17_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1700"></i> -->
                             Node Id 17
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="17_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="17_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="17_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="17_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="17_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="17_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="17_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="17_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="17_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="17_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="17_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="17_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="17_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -1010,18 +1256,30 @@
                       <div class="card-body">
                         <div class="dropdown no-arrow">
                           <a style="font-size: 140%; color: white" class="dropdown-toggle" href="#" role="button" id="18_fault" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <!-- <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-1800"></i> -->
                             Node Id 18
                           </a>
                           <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Types of Faults:</div>
-                            <a id="18_reboot" class="dropdown-item" href="#">Reboot</a>
-                            <a id="18_netdelay" class="dropdown-item" href="#">Network Delay</a>
-                            <a id="18_malicious" class="dropdown-item" href="#">Malicious
-                            </a>
-                            <!-- <div class="dropdown-divider"></div> -->
-                            <div class="dropdown-header">Remove all faults?:</div>
-                            <a id="18_benign" class="dropdown-item" href="#">Benign</a>
+                            <div class="dropdown-header">General:</div>
+                            <a id="18_Crash" class="dropdown-item" href="#">Crash</a>
+                            <div class="dropdown-header">NetworkDelay:</div>
+                            <label for="18_NetworkDelay"><span class="dropdown-item" >Time:</span></label>
+                            <select id="18_NetworkDelay">
+                              <option value="2">2 sec</option>
+                              <option value="5">5 sec</option>
+                              <option value="7">7 sec</option>
+                              <option value="10">10 sec</option>
+                            </select>
+                            
+                            <div class="dropdown-header">Malicious:</div>
+                            <a id="18_InCorrectReply" class="dropdown-item" href="#">InCorrect Reply</a>
+                            <a id="18_ModifyOperands" class="dropdown-item" href="#">Modify Operands</a>
+                            <a id="18_FakeViewChange" class="dropdown-item" href="#">Fake View Change</a>
+                            <a id="18_ReplayAttack" class="dropdown-item" href="#">Replay Attack</a>
+
+                            <div class="dropdown-header">Righteous:</div>
+                            <a id="18_Benign" class="dropdown-item" href="#">Benign</a>
+
+                            <div class="dropdown-header">State:</div>
                             <a id="18_status" class="dropdown-item" href="#">Node State</a>
                             
                           </div>
@@ -1185,40 +1443,131 @@
 
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-    $.fn.NodeBlocks = function(NodeID, fault_type){ 
-      var malicious = false;
-      var reboot = false;
-      var netdelay = false;
-      var benign = false;
+    $.fn.Faults = function(NodeID, fault_type){
+      $('#' + NodeID + '_fault_status').text(fault_type)
+      $('#' + NodeID + '_fault_status').css({ 'color': 'red', 'font-size': '120%'});
+      var refreshId = setInterval( function() 
+      {
+        $('#' + NodeID + '_fault_status').css({ 'color': 'grey' ,'font-weight': '700', 'font-size': '100%' });
+      }, 1500);
 
-      if(fault_type == 'malicious'){
-        malicious = true;
+    }
+
+    $.fn.NodeBlocks = function(NodeID, fault_type){ 
+      var InCorrectReply = false;
+      var ModifyOperands = false;
+      var FakeViewChange = false;
+      var ReplayAttack = false;
+      var Crash = false;
+      var NetworkDelay = false;
+      var TimeDelay = "0 sec";
+      var Benign = false;
+
+      if(fault_type == 'InCorrectReply'){
+        InCorrectReply = true;
         $('#' + NodeID + '_card').removeClass('bg-success');
         $('#' + NodeID + '_card').removeClass('bg-warning');
         $('#' + NodeID + '_card').addClass('bg-danger');
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.Faults(NodeID, fault_type);
+
       }
-      else if(fault_type == 'reboot'){
-        reboot = true;
+
+      else if(fault_type == 'ModifyOperands'){
+        ModifyOperands = true;
+        $('#' + NodeID + '_card').removeClass('bg-success');
+        $('#' + NodeID + '_card').removeClass('bg-warning');
+        $('#' + NodeID + '_card').addClass('bg-danger');
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.Faults(NodeID, fault_type);
+
+      }
+
+      else if(fault_type == 'FakeViewChange'){
+        FakeViewChange = true;
+        $('#' + NodeID + '_card').removeClass('bg-success');
+        $('#' + NodeID + '_card').removeClass('bg-warning');
+        $('#' + NodeID + '_card').addClass('bg-danger');
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.Faults(NodeID, fault_type);
+
+      }
+
+      else if(fault_type == 'ReplayAttack'){
+        ReplayAttack = true;
+        $('#' + NodeID + '_card').removeClass('bg-success');
+        $('#' + NodeID + '_card').removeClass('bg-warning');
+        $('#' + NodeID + '_card').addClass('bg-danger');
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.Faults(NodeID, fault_type);
+
+
+      }
+      else if(fault_type == 'Crash'){
+        Crash = true;
         $('#' + NodeID + '_card').removeClass('bg-success');
         $('#' + NodeID + '_card').removeClass('bg-danger');
         $('#' + NodeID + '_card').addClass('bg-warning');
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').removeClass('bg-danger');
+        $('#' + NodeID + '_progress').addClass('bg-warning');
+        $.fn.Faults(NodeID, fault_type);
+
 
       }
-      else if(fault_type == 'netdelay'){
-        netdelay = true;
+      else if(fault_type == 'NetworkDelay'){
+        NetworkDelay = true;
+        TimeDelay = $( "#" + NodeID + '_' + fault_type + " option:selected" ).text()
+        // TimeDelay = $( "#0_NetworkDelay option:selected" ).text()
+        console.log(TimeDelay)
         $('#' + NodeID + '_card').removeClass('bg-success');
         $('#' + NodeID + '_card').removeClass('bg-warning');
         $('#' + NodeID + '_card').addClass('bg-danger');
+
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.Faults(NodeID, fault_type);
+
+
       }
-      else if(fault_type == 'benign'){
-        benign = true;
+      else if(fault_type == 'Benign'){
+        Benign = true;
         $('#' + NodeID + '_card').removeClass('bg-warning');
         $('#' + NodeID + '_card').removeClass('bg-danger');
         $('#' + NodeID + '_card').addClass('bg-success');
+
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').removeClass('bg-danger');
+        $('#' + NodeID + '_progress').addClass('bg-success');
+
+        $('#' + NodeID + '_fault_status').text('Benign')
+        $('#' + NodeID + '_fault_status').css({ 'color': 'green', 'font-size': '120%'});
+        var refreshId = setInterval( function() 
+        {
+          $('#' + NodeID + '_fault_status').css({ 'color': 'grey' ,'font-weight': '700', 'font-size': '100%' });
+        }, 1500);
       }
 
-      socket.emit('faults', {id: NodeID, malicious: malicious, reboot: reboot, netdelay: netdelay, benign: benign});
-      console.log(JSON.stringify({id: NodeID, malicious: malicious, reboot: reboot, netdelay: netdelay, benign: benign}))
+      socket.emit('faults', {id: NodeID,
+                             InCorrectReply: InCorrectReply,
+                             ModifyOperands: ModifyOperands, 
+                             FakeViewChange: FakeViewChange, 
+                             ReplayAttack: ReplayAttack, 
+                             Crash: Crash, 
+                             NetworkDelay: NetworkDelay,
+                             TimeDelay: TimeDelay, 
+                             Benign: Benign});
+
+      // console.log(JSON.stringify({id: NodeID, malicious: malicious, crash: crash, netdelay: netdelay, benign: benign}))
 
     }
     // $('#alloc_form').hide();
@@ -1297,7 +1646,7 @@
       });
     });
 
-    faults = ['malicious', 'reboot', 'netdelay', 'benign'];
+    faults = ['InCorrectReply', 'ModifyOperands', 'FakeViewChange', 'ReplayAttack', 'Crash', 'NetworkDelay', 'Benign'];
     for(var node=0; node<19; node++){
       for(var fault=0; fault< faults.length; fault++){
         $('#' + node.toString() + '_' + faults[fault]).click(function (e) {
@@ -1326,6 +1675,8 @@
       var status_log = {'0':[], '1':[], '2': [], '3':[]};
       var view = 0;
 
+      console.log($( "#0_NetworkDelay option:selected" ).text());
+
       //receive details from server
       socket.on('clients', function(msg) {
           console.log("Received number" + msg.number);
@@ -1338,6 +1689,7 @@
         // reply_string = 'Reply: ' + '<p>' + msg.reply.toString() + '</p>';
         console.log("res = " + $('#result').val())
         $('#result').val(msg.reply.toString());
+        $('#client_view').text("Client View: " + msg['view'].toString());
       });
 
       socket.on('allocated', function(msg) {
@@ -1366,6 +1718,7 @@
           $('#' + msg['id'].toString() + '_text').show();
           $('#' + msg['id'].toString() + '_bar').show();
           $('#' + msg['id'].toString() + '_progress').show(); 
+          $('#' + msg['id'].toString() + '_progress').text('sleep')
           $('#' + msg['id'].toString() + '_progress').css({ 'color': 'black' ,'font-size': '140%' });
           // var text = $('#' + msg['id'].toString() + '_text').text()
           $('#' + msg['id'].toString() + '_view').text('\t\tView = ' + msg['view']);
@@ -1449,6 +1802,19 @@
 
 
           
+      });
+
+      socket.on('reply_count', function(msg) {
+        // console.log("Allocated " + msg.total);
+        console.log("Inside reply_count");
+        var vals = "";
+        for (const [key, value] of Object.entries(msg['reply_count'])) {
+          console.log(key, value);
+          // vals += key.toString() + ": " + value.toString() + ""
+          vals += value.toString() + " reply(s) for Result " + key.toString()
+        }
+
+        $('#reply_count').text("Result: " + vals);
       });
 
       socket.on('debug', function(msg) {

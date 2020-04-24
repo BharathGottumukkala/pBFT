@@ -136,18 +136,28 @@ def Multicast(MCAST_GRP, MCAST_PORT, msg, faults=None):
 	message = json.dumps(msg).encode('utf-8')
 
 	if faults is not None:
-		if faults['malicious']:
+		if faults['InCorrectReply']:
 			# Implement after deciding what to implement
 			pass
-		elif faults['reboot']:
+
+		elif faults['ModifyOperands']:
+			pass
+
+		elif faults['FakeViewChange']:
+			pass
+
+		elif faults['ReplayAttack']:
+			pass
+
+		elif faults['Crash']:
 			time.sleep(7)
 			# Have to reinitialize node properties
 			# Dont send msg
-		elif faults['netdelay']:
-			time.delay(2)
+		elif faults['NetworkDelay']:
+			time.sleep(int(faults['TimeDelay']))
 			sent = sock.sendto(message, (MCAST_GRP, MCAST_PORT))
 
-		elif faults['benign']:
+		elif faults['Benign']:
 			sent = sock.sendto(message, (MCAST_GRP, MCAST_PORT))
 
 	else:

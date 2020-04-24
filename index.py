@@ -30,7 +30,12 @@ port = 4003
 MaxNodes = 19
 
 ConnectedClients = {}
+# check for timestamp etc
 reply = {}
+
+# store the different receivd replies
+reply_count = {}
+
 view_change = {}
 primary = None
 n = 0
@@ -208,23 +213,50 @@ def on_log(data):
 
 @socketio.on('reply')
 def on_reply(data):
-	global reply, view
+	global reply, view, reply_count
 	print(data)
 	jwt = messaging.jwt()
 	token = jwt.get_payload(data['token'])
 	print(token)
+
+	# if token['r'] in reply_count:
+	# 	reply_count[token['r']] += 1
+
+	# else:
+	# 	reply_count[token['r']] = 1
+
+	if token['t'] in reply_count:
+		if token['r'] in reply_count[token['t']]:
+			reply_count[token['t']][token['r']] += 1
+			
+		else:
+			reply_count[token['t']][token['r']] = 1
+
+	else:
+		reply_count[token['t']] = {token['r']: 1}
+
+
 	if token['t'] in reply:
 		if token['r'] == reply[token['t']]['r']:
 			reply[token['t']]['count'] += 1
+			
+		else:
+			reply_count[token['r']] = 1
+
 	else:
 		reply[token['t']] = {'r': token['r'], 'count': 0, 'view': token['v']}
 
+	print(f"Emitting reply_count as {reply_count} ")
+
+	socketio.emit('reply_count', {'reply_count': reply_count[token['t']]})
+
 	print(f"Count = {reply[token['t']]['count']}")
-	if reply[token['t']]['count'] >= (len(ConnectedClients)//3) + 1:
+	if reply[token['t']]['count'] >= (nodes_info['allocated']//3) + 1:
 		view = reply[token['t']]['view']
 		print("Socket emiting. view:", view)
-		socketio.emit('Reply', {'reply': reply[token['t']]['r'] })
+		socketio.emit('Reply', {'reply': reply[token['t']]['r'], 'view': reply[token['t']]['view'] })
 		print("Socket emited. view:", view)
+		# reply_count = {}
 
 
 @socketio.on('status')
