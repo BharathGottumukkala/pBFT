@@ -23,6 +23,9 @@ socketio = SocketIO(app)
 
 ROOMS = {} # dict to track active rooms
 
+MULTICAST_SERVER_IP = '224.1.1.1'
+MULTICAST_SERVER_PORT = 8766
+
 port = 4003
 MaxNodes = 19
 
@@ -262,8 +265,7 @@ def on_debug(data):
 @socketio.on('ForceViewChange')
 def on_forced_view_change(data):
 	print("Forced View  Change Initiated")
-
-	# Do Something wth it
+	communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, {'type': 'Force-View-Change'})
 
 
 

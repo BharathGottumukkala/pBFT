@@ -143,10 +143,11 @@ class Node(object):
 				self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
 
 	
-	def InitiateViewChange(self, message):
-		if handle_requests.digest(message) in self.log.log:
-			print(f"{self.NodeId} -> Timer ran out. But primary replied. Phew!!")
-			return
+	def InitiateViewChange(self, message=None):
+		if message is not None:
+			if handle_requests.digest(message) in self.log.log:
+				print(f"{self.NodeId} -> Timer ran out. But primary replied. Phew!!")
+				return
 
 		print(f"{self.NodeId} -> Timer ran out without the primary replying!")
 		# # # View change
@@ -222,7 +223,8 @@ class Node(object):
 			elif message['type'].upper() not in ['VIEW-CHANGE', 'NEW-VIEW'] and self.mode == 'View-Change':
 				return #dont do anything, there is something wrong with the distributed system!
 
-
+			elif message['type'].upper() == 'FORCE-VIEW-CHANGE':
+				self.InitiateViewChange()
 
 
 			# # # Get and register client's info
