@@ -32,15 +32,8 @@ def Request(message, public_key, view, n, private_key, faulty=False):
 			print("Modified operands:", payload)
 			token = messaging.jwt(json=payload, header={"alg": "RSA"}, key=private_key)
 			token = token.get_token()
-			# print("token")
-			# print(token)
-			# print("message")
-			# print(message)
-			# # # replace my signature with original
 			message['token'] = ".".join(token.split(
 				'.')[:2] + [message['token'].split('.')[-1]])
-			# print("message")
-			# print(message)
 
 		# # # If verified, create a new message to forward to other nodes
 		pre_prepare = {"v": view,"n": n, "d": digest(message)}
