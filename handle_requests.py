@@ -1,6 +1,7 @@
 import messaging
 import hashlib
 import json
+import random
 
 def IsNValid(n):
 	# have to do something about that h < n < H
@@ -12,17 +13,40 @@ def digest(message:dict, hash="SHA256"):
 
 
 
-def Request(message, public_key, view, n, private_key):
+def Request(message, public_key, view, n, private_key, faulty=False):
+	import pickle
+	pickle.dump(message, open("message.pickle", 'wb'))
 	verifier = messaging.jwt(jwt=message['token'])
-	# Verify the signatue on the token
+	# # # Verify the signatue on the token
 	verify = verifier.verify(public_key, message['token'])
 	final = None
 	if verify:
-		# If verified, create a new message to forward to other nodes
+		# # # Change operands in original message
+		if faulty:
+			# # # create a new message with own signature
+			jwt = messaging.jwt()
+			payload = jwt.get_payload(message['token'])
+			payload = dict(payload)
+			payload['args']['num1'] = str(int(payload['args']['num1']) + 1)
+			payload['args']['num2'] = str(int(payload['args']['num2']) + 1)
+			print("Modified operands:", payload)
+			token = messaging.jwt(json=payload, header={"alg": "RSA"}, key=private_key)
+			token = token.get_token()
+			# print("token")
+			# print(token)
+			# print("message")
+			# print(message)
+			# # # replace my signature with original
+			message['token'] = ".".join(token.split(
+				'.')[:2] + [message['token'].split('.')[-1]])
+			# print("message")
+			# print(message)
+
+		# # # If verified, create a new message to forward to other nodes
 		pre_prepare = {"v": view,"n": n, "d": digest(message)}
 		pre_prepare = json.dumps(pre_prepare)
 		pre_prepare = json.loads(pre_prepare)
-		# Sign the meessage to generate the token using your privte_key
+		# # # Sign the meessage to generate the token using your privte_key
 		pre_prepare = messaging.jwt(json=pre_prepare, header={"alg": "RSA"}, key=private_key)
 		pre_prepare = pre_prepare.get_token()
 
@@ -52,6 +76,8 @@ def Preprepare(message, public_key_client, public_key_primary, NodeId, private_k
 		prepare = messaging.jwt(json=prepare, header={"alg": "RSA"}, key=private_key_self)
 		prepare = prepare.get_token()
 		result = {'type': 'Prepare', 'token': prepare}
+	else:
+		print(f"{NodeId} --> Something didnt verify in handle_requests.Preprepare!")
 
 	return result
 
@@ -86,7 +112,7 @@ def CreateCommit(message, NodeId, private_key_self):
 
 	return message
 
-def CreateReply(message, clog, NodeId, private_key_self):
+def CreateReply(message, clog, NodeId, private_key_self, faulty=False):
 	jwt = messaging.jwt()
 	payload = jwt.get_payload(message['token'])
 	cur_log = clog.log[payload['d']]
@@ -95,8 +121,11 @@ def CreateReply(message, clog, NodeId, private_key_self):
 	reply = {'v': payload['v'], 't': original_message['t'], 'c': original_message['c'], 'i': NodeId}
 	op = original_message['o']
 	if op == 'add':
-		result = int(original_message['args']['num1']) + int(original_message['args']['num2'])
-		result = str(result) 
+		if faulty:
+			result = str(random.randint(1, 1000))
+		else:
+			result = int(original_message['args']['num1']) + int(original_message['args']['num2'])
+			result = str(result) 
 
 	reply['r'] = result
 	token = messaging.jwt(json=reply, header={"alg": "RSA"}, key=private_key_self)

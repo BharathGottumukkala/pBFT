@@ -12,6 +12,7 @@ import time
 
 # Custom imports
 
+
 # commuication handles Sending messages to different nodes
 import communication	
 
@@ -70,7 +71,7 @@ class Node(object):
 		
 		"""
 		self.faults = {'InCorrectReply': False,
-					   'ModifyOperands': False, 
+					   'ModifyOperands': True, 
 					   'FakeViewChange': False, 
 					   'ReplayAttack': False,  
 					   'Crash': False, 
@@ -120,6 +121,17 @@ class Node(object):
 	def SendStatusUpdate(self, new_mode):
 		report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': new_mode})
 
+	def ResetFaults(self):
+		self.faults = {
+				'InCorrectReply': False, 	#DONE
+                'ModifyOperands': False,
+                'FakeViewChange': False,
+                'ReplayAttack': False,			
+                'Crash': False,				#DONE
+                'NetworkDelay': False,		#Hain?
+                'TimeDelay': 0,				#DONE
+                'Benign': True,				#DONE		
+				}
 
 	def ChangeMode(self, mode):
 		possible_modes = ['Sleep', 'Prepare', 'Commit', 'Checkpoint', 'View-Change']
@@ -185,12 +197,6 @@ class Node(object):
 			# token is generated using messaging library in handle_requests
 			message = json.loads(message)
 
-			
-			
-			# # # REBOOT NODE doesnt reply
-			if int(self.faults['Crash']):
-				return
-			
 
 			# # # When a new node is added, Register the nde's details for future communication
 			if message['type'].upper() == 'NEWNODE':
@@ -228,6 +234,10 @@ class Node(object):
 			elif message['type'].upper() == 'MODIFYFAULT':
 				# # # Update the config file with the delay
 				# config().UpdateAddress(message['id'], message['TimeDelay'].split()[0])
+				# # # Reset faults before update
+				self.ResetFaults()
+
+				# # # Update faults
 				del message['id']
 				del message['type']
 				for fault, value in message.items():
@@ -265,6 +275,9 @@ class Node(object):
 					report.Report(self.client_uri, 'status', {'test': 'All the best'})
 
 
+			# # # REBOOT NODE doesnt reply
+			elif int(self.faults['Crash']):
+				return
 
 
 			# # # Request recieved from client
@@ -279,8 +292,9 @@ class Node(object):
 					self.SendStatusUpdate("request")
 
 					# # # Verify client's sign and returns the next message to send
-					final_message = handle_requests.Request(message, self.client_public_key, self.view, seq_num, self.private_key)
-					
+					final_message = handle_requests.Request(
+						message, self.client_public_key, self.view, seq_num, self.private_key, faulty=self.faults['ModifyOperands'])
+					# print(f"{self.NodeId} -> Modified message:", final_message)
 					# # # verify we have not already recieved this request
 					if self.log.HasDigestEntry(final_message):
 						print(f"{self.NodeId} -> I ALREADY HAVE THIS MESSAGE IN MY LOG BROTHA!")
@@ -290,6 +304,7 @@ class Node(object):
 
 					if final_message is not None:
 						# # # sign on message verified: Multicast the request all nodes in the network
+						print(f"{self.NodeId} -> I AM BROADCASTING!:", final_message)
 						communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, final_message, self.faults)
 					else:
 						# # # Client did not verify
@@ -298,8 +313,8 @@ class Node(object):
 				else:
 					# # # Node is not primary. Send the message to the actual 
 					print(f"Well I am NOT the primary with ID = {self.NodeId} in view {self.view}. I shall forward it to the required owner!")
-					await communication.SendMsgRoutine(self.ListOfNodes[str(int(self.view) % self.total_allocated)]['Uri'], message)
 					self.SendStatusUpdate("request")
+					await communication.SendMsgRoutine(self.ListOfNodes[str(int(self.view) % self.total_allocated)]['Uri'], message)
 					self.timer = threading.Timer(TIMER_WAITING_TIME, self.InitiateViewChange, [message])
 					self.timer.start()
 
@@ -310,8 +325,10 @@ class Node(object):
 				public_key_primary = self.ListOfNodes[str(self.view % self.total_allocated)]['public_key']
 
 				# # # Send all the details. It will verify and return the next packet to send
+				print(f"{self.NodeId} -> Before PREPREPARE")
 				result = handle_requests.Preprepare(message, self.client_public_key, public_key_primary, self.NodeId, self.private_key, self.view)
-				
+				print(f"{self.NodeId} -> AFTER PREPREPARE", result)
+
 				# # # verification successful
 				if result is not None:
 					self.ChangeMode("Prepare")
@@ -355,7 +372,7 @@ class Node(object):
 				cur_log = self.log.RequestLog(cToken)
 				count = len(cur_log['commit'])
 				if count >= 2*self.total_allocated//3 and self.mode == 'Commit':
-					reply = handle_requests.CreateReply(message, self.log, self.NodeId, self.private_key)
+					reply = handle_requests.CreateReply(message, self.log, self.NodeId, self.private_key, faulty=self.faults['InCorrectReply'])
 					report.Report(self.client_uri, 'reply', reply)
 					self.SendStatusUpdate('reply')  # Report to UI that reply is to be sent
 					print(f"{self.NodeId} -> Sent a REPLY to the client!")
