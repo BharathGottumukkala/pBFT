@@ -126,7 +126,7 @@ class Node(object):
 				'InCorrectReply': False, 	#DONE
                 'ModifyOperands': False,	#DONE
                 'FakeViewChange': False,
-                'ReplayAttack': False,			
+                'ReplayAttack': False,		#DONE		
                 'Crash': False,				#DONE
                 'NetworkDelay': False,		#DONE
                 'TimeDelay': 0,				#DONE
@@ -173,21 +173,32 @@ class Node(object):
 				self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
 
 	
-	def InitiateViewChange(self, message=None):
+	def InitiateViewChange(self, message=None, view=None, tries=5):
 		if message is not None:
 			if handle_requests.digest(message) in self.log.log:
 				print(f"{self.NodeId} -> Timer ran out. But primary replied. Phew!!")
 				return
 
+		# prev view change failed
+		if view == self.view or tries == 0:
+			return
+
 		print(f"{self.NodeId} -> Timer ran out without the primary replying!")
+		
 		# # # View change
+		if view is None:
+			view = self.view
 		view_change_message = handle_requests.CreateViewChangeMessage(self.ckpt_log,
-													self.log, self.view, self.NodeId,
+													self.log, view, self.NodeId,
 													self.private_key)
 		# print(view_change_message)
 		communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, view_change_message)
 		self.ChangeMode('View-Change')
 
+		print(f"{self.NodeId} -> Starting recursive timer for view {view}.")
+		self.timer = threading.Timer(
+			TIMER_WAITING_TIME, self.InitiateViewChange, [message, view+1, tries-1])
+		self.timer.start()
 
 	def ReplayPreviousMessage(self):
 		print("Hehehehe.. I am {}. Attempting Replay attackk.. hehehehehe".format(self.NodeId))
@@ -266,8 +277,12 @@ class Node(object):
 				# # # If replay attack is turned on, run a replay attack timer!
 				if self.faults['ReplayAttack']:
 					self.ReplayPreviousMessage()
-				# replay_timer = threading.Timer(5, self.ReplayPreviousMessage)
-				# replay_timer.start()
+				
+				# # # Fake view change attack
+				if self.faults['FakeViewChange']:
+					self.InitiateViewChange()
+					mode_timer = threading.Timer(3, self.ChangeMode, ['Sleep'])
+					mode_timer.start()
 				
 
 			elif message['type'].upper() == 'DEBUG':
@@ -422,26 +437,33 @@ class Node(object):
 
 			elif message['type'].upper() == 'VIEW-CHANGE':
 				if handle_requests.VerifyViewChange(message, self.ListOfNodes):
-					self.view_change_log.AddViewChangeMessage(message)
+					self.view_change_log.AddViewChangeMessage(message, self.NodeId)
 
 					if self.view_change_log.NumMessages() > 2*self.total_allocated//3 and self.mode == 'View-Change':
 						# # # if new primary, tell everyone that view change successful!
 						# print(f"View = {self.view}, check = {int(self.view)+1} % {self.total_allocated} == {int(self.NodeId)}")
+<<<<<<< HEAD
 						if ((int(self.view)+1) % self.total_allocated) == int(self.NodeId):
 							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view+1}! I am telling everyone to finish changing view?")
 							time.sleep(1)
+=======
+						if (int(self.view_change_log.my_view_in_consideration) % self.total_allocated) == int(self.NodeId):
+							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view_change_log.my_view_in_consideration}! I am telling everyone to finish changing view?")
+>>>>>>> 60ec604c2cf939edfaedd0d0dda43f07b3f20dc6
 							new_view_message = handle_requests.CreateNewViewMessage(self.view, self.view_change_log, self.private_key)
 							communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, new_view_message)
+							self.ChangeMode('Sleep')
 
 				else:
 					print(f"{self.NodeId} -> Verification of ViewChange failed")
 
 			elif message['type'].upper() == 'NEW-VIEW':
-				if handle_requests.VerifyNewView(message, self.ListOfNodes, int(self.view+1)%self.total_allocated):
-					self.view = self.view + 1
+				if handle_requests.VerifyNewView(message, self.ListOfNodes, int(self.view_change_log.my_view_in_consideration)%self.total_allocated):
+					self.view = self.view_change_log.my_view_in_consideration
 					print(f"{self.NodeId} -> After changing views to {self.view}, I'm going to sleep....")
 					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'view_change'})
 					self.ChangeMode('Sleep')
+					self.view_change_log.flush()
 
 				# print(f"I am {self.NodeId} and I recieved a checkpoint message from {messaging.jwt().get_payload(message['token'])['i']}")
 

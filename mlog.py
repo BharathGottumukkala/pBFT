@@ -98,6 +98,7 @@ class CheckLog:
 class ViewChangeLog:
 	def __init__(self):
 		self.log = {}
+		self.my_view_in_consideration = 0
 		'''
 		format:
 		self.log = {
@@ -108,13 +109,15 @@ class ViewChangeLog:
 	def NumMessages(self):
 		return len(self.log)
 
-	def AddViewChangeMessage(self, message):
+	def AddViewChangeMessage(self, message, my_id):
 		'''
 		add view change message to log
 		'''
 		jwt = messaging.jwt()
 		view_change = jwt.get_payload(message['token'])
 		self.log[view_change['i']] = message['token']
+		if str(view_change['i']) == str(my_id):
+			self.my_view_in_consideration = view_change['v']
 
 	def flush(self):
 		self.log = {}
