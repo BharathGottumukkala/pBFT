@@ -363,7 +363,7 @@ class Node(object):
 				
 				# # # m should be in logs
 				verify_m = (pToken['d'] in self.log.log)
-
+				count = 0
 				if verify_p and verify_m:
 					self.log.AddPrepare(message)
 					cur_log = self.log.RequestLog(pToken)
@@ -424,6 +424,7 @@ class Node(object):
 						# print(f"View = {self.view}, check = {int(self.view)+1} % {self.total_allocated} == {int(self.NodeId)}")
 						if ((int(self.view)+1) % self.total_allocated) == int(self.NodeId):
 							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view+1}! I am telling everyone to finish changing view?")
+							time.sleep(1)
 							new_view_message = handle_requests.CreateNewViewMessage(self.view, self.view_change_log, self.private_key)
 							communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, new_view_message)
 
