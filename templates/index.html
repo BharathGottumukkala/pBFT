@@ -1443,6 +1443,21 @@
 
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 
+    $.fn.Initialize = function(NodeID){
+
+
+      $('#' + NodeID + '_card').removeClass('bg-warning');
+      $('#' + NodeID + '_card').removeClass('bg-danger');
+      $('#' + NodeID + '_card').addClass('bg-success');
+
+      $('#' + NodeID + '_progress').removeClass('bg-warning');
+      $('#' + NodeID + '_progress').removeClass('bg-danger');
+      $('#' + NodeID + '_progress').addClass('bg-success');
+
+      $('#' + NodeID + '_fault_status').text('Benign')
+
+    }
+
     $.fn.Faults = function(NodeID, fault_type){
       $('#' + NodeID + '_fault_status').text(fault_type)
       $('#' + NodeID + '_fault_status').css({ 'color': 'red', 'font-size': '120%'});
@@ -1452,6 +1467,57 @@
       }, 1500);
 
     }
+
+    $.fn.CardVisuals = function(NodeID, CssClass){
+      if(CssClass == 'bg-danger'){
+        $('#' + NodeID + '_card').removeClass('bg-success');
+        $('#' + NodeID + '_card').removeClass('bg-secondary');
+        $('#' + NodeID + '_card').removeClass('bg-warning');
+        $('#' + NodeID + '_card').addClass('bg-danger');
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').removeClass('bg-secondary');
+        $('#' + NodeID + '_progress').addClass('bg-danger');
+
+      }
+      else if(CssClass == 'bg-warning'){
+        $('#' + NodeID + '_card').removeClass('bg-success');
+        $('#' + NodeID + '_card').removeClass('bg-danger');
+        $('#' + NodeID + '_card').removeClass('bg-secondary');
+        $('#' + NodeID + '_card').addClass('bg-warning');
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').removeClass('bg-danger');
+        $('#' + NodeID + '_progress').removeClass('bg-secondary');
+        $('#' + NodeID + '_progress').addClass('bg-warning');
+
+      }
+      else if(CssClass == 'bg-success'){
+        $('#' + NodeID + '_card').removeClass('bg-warning');
+        $('#' + NodeID + '_card').removeClass('bg-danger');
+        $('#' + NodeID + '_card').removeClass('bg-secondary');
+        $('#' + NodeID + '_card').addClass('bg-success');
+
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').removeClass('bg-danger');
+        $('#' + NodeID + '_progress').removeClass('bg-secondary');
+        $('#' + NodeID + '_progress').addClass('bg-success');
+      }
+
+      else if(CssClass == 'bg-secondary'){
+        $('#' + NodeID + '_card').removeClass('bg-warning');
+        $('#' + NodeID + '_card').removeClass('bg-danger');
+        $('#' + NodeID + '_card').removeClass('bg-success');
+        $('#' + NodeID + '_card').addClass('bg-secondary');
+
+        $('#' + NodeID + '_progress').removeClass('bg-warning');
+        $('#' + NodeID + '_progress').removeClass('bg-danger');
+        $('#' + NodeID + '_progress').removeClass('bg-success');
+        $('#' + NodeID + '_progress').addClass('bg-secondary');
+      }
+      
+    }
+
+
 
     $.fn.NodeBlocks = function(NodeID, fault_type){ 
       var InCorrectReply = false;
@@ -1465,89 +1531,55 @@
 
       if(fault_type == 'InCorrectReply'){
         InCorrectReply = true;
-        $('#' + NodeID + '_card').removeClass('bg-success');
-        $('#' + NodeID + '_card').removeClass('bg-warning');
-        $('#' + NodeID + '_card').addClass('bg-danger');
-        $('#' + NodeID + '_progress').removeClass('bg-success');
-        $('#' + NodeID + '_progress').removeClass('bg-warning');
-        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.CardVisuals(NodeID, 'bg-warning');
         $.fn.Faults(NodeID, fault_type);
 
       }
 
       else if(fault_type == 'ModifyOperands'){
         ModifyOperands = true;
-        $('#' + NodeID + '_card').removeClass('bg-success');
-        $('#' + NodeID + '_card').removeClass('bg-warning');
-        $('#' + NodeID + '_card').addClass('bg-danger');
-        $('#' + NodeID + '_progress').removeClass('bg-success');
-        $('#' + NodeID + '_progress').removeClass('bg-warning');
-        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.CardVisuals(NodeID, 'bg-warning');
         $.fn.Faults(NodeID, fault_type);
-
       }
 
       else if(fault_type == 'FakeViewChange'){
         FakeViewChange = true;
-        $('#' + NodeID + '_card').removeClass('bg-success');
-        $('#' + NodeID + '_card').removeClass('bg-warning');
-        $('#' + NodeID + '_card').addClass('bg-danger');
-        $('#' + NodeID + '_progress').removeClass('bg-success');
-        $('#' + NodeID + '_progress').removeClass('bg-warning');
-        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.CardVisuals(NodeID, 'bg-secondary');
         $.fn.Faults(NodeID, fault_type);
-
       }
 
       else if(fault_type == 'ReplayAttack'){
         ReplayAttack = true;
-        $('#' + NodeID + '_card').removeClass('bg-success');
-        $('#' + NodeID + '_card').removeClass('bg-warning');
-        $('#' + NodeID + '_card').addClass('bg-danger');
-        $('#' + NodeID + '_progress').removeClass('bg-success');
-        $('#' + NodeID + '_progress').removeClass('bg-warning');
-        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.CardVisuals(NodeID, 'bg-warning');
         $.fn.Faults(NodeID, fault_type);
 
-
+        var refreshId = setInterval( function() 
+        {
+          $.fn.CardVisuals(NodeID, 'bg-success');
+          $('#' + NodeID + '_fault_status').text('Benign')
+          $('#' + NodeID + '_fault_status').css({ 'color': 'grey' ,'font-weight': '700', 'font-size': '100%' });
+          // $.fn.Faults(NodeID, 'Benign');
+        }, 3000);
       }
       else if(fault_type == 'Crash'){
         Crash = true;
-        $('#' + NodeID + '_card').removeClass('bg-success');
-        $('#' + NodeID + '_card').removeClass('bg-danger');
-        $('#' + NodeID + '_card').addClass('bg-warning');
-        $('#' + NodeID + '_progress').removeClass('bg-success');
-        $('#' + NodeID + '_progress').removeClass('bg-danger');
-        $('#' + NodeID + '_progress').addClass('bg-warning');
+        $.fn.CardVisuals(NodeID, 'bg-danger');        
         $.fn.Faults(NodeID, fault_type);
-
-
       }
+
       else if(fault_type == 'NetworkDelay'){
         NetworkDelay = true;
         TimeDelay = $( "#" + NodeID + '_' + fault_type + " option:selected" ).text()
         // TimeDelay = $( "#0_NetworkDelay option:selected" ).text()
         console.log(TimeDelay)
-        $('#' + NodeID + '_card').removeClass('bg-success');
-        $('#' + NodeID + '_card').removeClass('bg-warning');
-        $('#' + NodeID + '_card').addClass('bg-danger');
-
-        $('#' + NodeID + '_progress').removeClass('bg-success');
-        $('#' + NodeID + '_progress').removeClass('bg-warning');
-        $('#' + NodeID + '_progress').addClass('bg-danger');
+        $.fn.CardVisuals(NodeID, 'bg-danger');        
         $.fn.Faults(NodeID, fault_type);
 
 
       }
       else if(fault_type == 'Benign'){
         Benign = true;
-        $('#' + NodeID + '_card').removeClass('bg-warning');
-        $('#' + NodeID + '_card').removeClass('bg-danger');
-        $('#' + NodeID + '_card').addClass('bg-success');
-
-        $('#' + NodeID + '_progress').removeClass('bg-warning');
-        $('#' + NodeID + '_progress').removeClass('bg-danger');
-        $('#' + NodeID + '_progress').addClass('bg-success');
+        $.fn.CardVisuals(NodeID, 'bg-success');        
 
         $('#' + NodeID + '_fault_status').text('Benign')
         $('#' + NodeID + '_fault_status').css({ 'color': 'green', 'font-size': '120%'});
@@ -1719,11 +1751,14 @@
           $('#' + msg['id'].toString() + '_bar').show();
           $('#' + msg['id'].toString() + '_progress').show(); 
           $('#' + msg['id'].toString() + '_progress').text('sleep')
-          $('#' + msg['id'].toString() + '_progress').css({ 'color': 'black' ,'font-size': '140%' });
+          $('#' + msg['id'].toString() + '_progress').css({ 'color': 'black' ,'font-size': '140%', 'width': '0%' });
           // var text = $('#' + msg['id'].toString() + '_text').text()
           $('#' + msg['id'].toString() + '_view').text('\t\tView = ' + msg['view']);
           view = msg['view'];
           $('#' + msg['id'].toString() + '_card').show()
+          $.fn.Initialize(msg['id'].toString());
+
+
 
         }
         // else if (msg['status'] == 'view-change'){
@@ -1779,6 +1814,11 @@
             }, 1000);
 
           }
+        }
+
+        else if(msg['status'] == 'view-change'){
+          $('#' + msg['id'].toString() + '_progress').css('width' , '0%'); 
+
         }
 
         if(msg['status'] != 'allocated' && msg['status'] != 'deallocated'){

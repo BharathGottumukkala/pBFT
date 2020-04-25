@@ -227,6 +227,7 @@ class Node(object):
 				self.view_change_log.flush()
 				self.view = 0
 				self.total_allocated = message['total']
+				self.ResetFaults()
 				self.SendStatusUpdate('allocated')
 				# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'allocated'})
 
@@ -307,7 +308,7 @@ class Node(object):
 				if handle_requests.digest(message) in self.log.log:
 					print(f"{self.NodeId} -> I ALREADY HAVE THIS MESSAGE IN MY LOG BROTHA!")
 					time.sleep(1)
-					self.SendStatusUpdate('Sleep')
+					self.SendStatusUpdate('sleep')
 					return
 
 				if self.IsPrimary():
@@ -374,7 +375,7 @@ class Node(object):
 					count = len(cur_log['prepare'])
 
 				# If enough 2f+1 nodes ready to 'Prepare', go to 'Commit'
-				if count >= 2*self.total_allocated//3 :
+				if count > 2*self.total_allocated//3 :
 					if self.mode == 'Prepare':
 						commit = handle_requests.CreateCommit(message, self.NodeId, self.private_key)
 						self.ChangeMode("Commit")
@@ -388,7 +389,7 @@ class Node(object):
 
 				cur_log = self.log.RequestLog(cToken)
 				count = len(cur_log['commit'])
-				if count >= 2*self.total_allocated//3 and self.mode == 'Commit':
+				if count > 2*self.total_allocated//3 and self.mode == 'Commit':
 					reply = handle_requests.CreateReply(message, self.log, self.NodeId, self.private_key, faulty=self.faults['InCorrectReply'])
 					report.Report(self.client_uri, 'reply', reply)
 					self.SendStatusUpdate('reply')  # Report to UI that reply is to be sent
@@ -412,7 +413,7 @@ class Node(object):
 						print(f"{self.NodeId} -> Adding checkpoint to log!")
 						self.ckpt_log.AddCheckpoint(message)
 						# flush logs
-						if self.ckpt_log.NumMessages() >= 2*self.total_allocated//3 and self.mode == 'Checkpoint':
+						if self.ckpt_log.NumMessages() > 2*self.total_allocated//3 and self.mode == 'Checkpoint':
 							self.log.flush()
 							print(f"{self.NodeId} -> FLUSHING MESSAGE LOGS!")
 							self.ChangeMode('Sleep')
@@ -423,7 +424,7 @@ class Node(object):
 				if handle_requests.VerifyViewChange(message, self.ListOfNodes):
 					self.view_change_log.AddViewChangeMessage(message)
 
-					if self.view_change_log.NumMessages() >= 2*self.total_allocated//3 and self.mode == 'View-Change':
+					if self.view_change_log.NumMessages() > 2*self.total_allocated//3 and self.mode == 'View-Change':
 						# # # if new primary, tell everyone that view change successful!
 						# print(f"View = {self.view}, check = {int(self.view)+1} % {self.total_allocated} == {int(self.NodeId)}")
 						if ((int(self.view)+1) % self.total_allocated) == int(self.NodeId):
