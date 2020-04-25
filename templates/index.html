@@ -1461,7 +1461,7 @@
     $.fn.Faults = function(NodeID, fault_type){
       $('#' + NodeID + '_fault_status').text(fault_type)
       $('#' + NodeID + '_fault_status').css({ 'color': 'red', 'font-size': '120%'});
-      var refreshId = setInterval( function() 
+      var refreshId = setTimeout( function() 
       {
         $('#' + NodeID + '_fault_status').css({ 'color': 'grey' ,'font-weight': '700', 'font-size': '100%' });
       }, 1500);
@@ -1553,10 +1553,11 @@
         $.fn.CardVisuals(NodeID, 'bg-warning');
         $.fn.Faults(NodeID, fault_type);
 
-        var refreshId = setInterval( function() 
+        var refreshId = setTimeout( function() 
         {
+          console.log(NodeID, fault_type)
           $.fn.CardVisuals(NodeID, 'bg-success');
-          $('#' + NodeID + '_fault_status').text('Benign')
+          $('#' + NodeID + '_fault_status').text('Benign');
           $('#' + NodeID + '_fault_status').css({ 'color': 'grey' ,'font-weight': '700', 'font-size': '100%' });
           // $.fn.Faults(NodeID, 'Benign');
         }, 3000);
@@ -1583,8 +1584,9 @@
 
         $('#' + NodeID + '_fault_status').text('Benign')
         $('#' + NodeID + '_fault_status').css({ 'color': 'green', 'font-size': '120%'});
-        var refreshId = setInterval( function() 
+        var refreshId = setTimeout( function() 
         {
+
           $('#' + NodeID + '_fault_status').css({ 'color': 'grey' ,'font-weight': '700', 'font-size': '100%' });
         }, 1500);
       }
@@ -1707,7 +1709,7 @@
       var status_log = {'0':[], '1':[], '2': [], '3':[]};
       var view = 0;
 
-      console.log($( "#0_NetworkDelay option:selected" ).text());
+      // console.log($( "#0_NetworkDelay option:selected" ).text());
 
       //receive details from server
       socket.on('clients', function(msg) {
@@ -1808,7 +1810,7 @@
             console.log('\t\tNew View = ' + msg['view']);
             $('#' + msg['id'].toString() + '_view').text('\t\tView = ' + view.toString());
             $('#' + msg['id'].toString() + '_view').css({ 'color': 'green', 'font-size': '120%' });
-            var refreshId = setInterval( function() 
+            var refreshId = setTimeout( function() 
             {
               $('#' + msg['id'].toString() + '_view').css({ 'color': 'grey' ,'font-weight': '700', 'font-size': '100%' });
             }, 1000);

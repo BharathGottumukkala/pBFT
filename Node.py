@@ -442,14 +442,14 @@ class Node(object):
 					if self.view_change_log.NumMessages() > 2*self.total_allocated//3 and self.mode == 'View-Change':
 						# # # if new primary, tell everyone that view change successful!
 						# print(f"View = {self.view}, check = {int(self.view)+1} % {self.total_allocated} == {int(self.NodeId)}")
-<<<<<<< HEAD
-						if ((int(self.view)+1) % self.total_allocated) == int(self.NodeId):
-							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view+1}! I am telling everyone to finish changing view?")
-							time.sleep(1)
-=======
+
+						# if ((int(self.view)+1) % self.total_allocated) == int(self.NodeId):
+						# 	print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view+1}! I am telling everyone to finish changing view?")
+						# 	time.sleep(1)
+
 						if (int(self.view_change_log.my_view_in_consideration) % self.total_allocated) == int(self.NodeId):
 							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view_change_log.my_view_in_consideration}! I am telling everyone to finish changing view?")
->>>>>>> 60ec604c2cf939edfaedd0d0dda43f07b3f20dc6
+
 							new_view_message = handle_requests.CreateNewViewMessage(self.view, self.view_change_log, self.private_key)
 							communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, new_view_message)
 							self.ChangeMode('Sleep')
