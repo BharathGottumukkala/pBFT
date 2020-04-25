@@ -71,7 +71,7 @@ class Node(object):
 		
 		"""
 		self.faults = {'InCorrectReply': False,
-					   'ModifyOperands': True, 
+					   'ModifyOperands': False, 
 					   'FakeViewChange': False, 
 					   'ReplayAttack': False,  
 					   'Crash': False, 
@@ -124,11 +124,11 @@ class Node(object):
 	def ResetFaults(self):
 		self.faults = {
 				'InCorrectReply': False, 	#DONE
-                'ModifyOperands': False,
+                'ModifyOperands': False,	#DONE
                 'FakeViewChange': False,
                 'ReplayAttack': False,			
                 'Crash': False,				#DONE
-                'NetworkDelay': False,		#Hain?
+                'NetworkDelay': False,		#DONE
                 'TimeDelay': 0,				#DONE
                 'Benign': True,				#DONE		
 				}
@@ -187,6 +187,12 @@ class Node(object):
 		# print(view_change_message)
 		communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, view_change_message)
 		self.ChangeMode('View-Change')
+
+
+	def ReplayPreviousMessage(self):
+		log = self.log.log
+		# if 
+
 
 
 	async def RunRoutine(self, websocket, path):
@@ -249,6 +255,11 @@ class Node(object):
 				print(f"{self.NodeId} -> Modified Fault parameters")
 				print(self.faults)
 
+				# # # If replay attack is turned on, run a replay attack timer!
+				replay_timer = threading.Timer(5, self.ReplayPreviousMessage)
+				replay_timer.start()
+				
+
 			elif message['type'].upper() == 'DEBUG':
 				report.Report(self.client_uri, 'debug', {'id': self.NodeId, 'view':self.view})
 
@@ -282,6 +293,15 @@ class Node(object):
 
 			# # # Request recieved from client
 			elif message['type'].upper() == 'REQUEST' and self.mode == 'Sleep':
+				# # # verify we have not already recieved this request
+				self.SendStatusUpdate('request')
+				if handle_requests.digest(message) in self.log.log:
+					print(f"{self.NodeId} -> I ALREADY HAVE THIS MESSAGE IN MY LOG BROTHA!")
+					return
+				time.sleep(1)
+				self.SendStatusUpdate('Sleep')
+				time.sleep(1)
+
 				if self.IsPrimary():
 					print(f"I am the primary with ID = {self.NodeId}. And I have just recieved a REQUEST from the client!")
 
@@ -294,17 +314,12 @@ class Node(object):
 					# # # Verify client's sign and returns the next message to send
 					final_message = handle_requests.Request(
 						message, self.client_public_key, self.view, seq_num, self.private_key, faulty=self.faults['ModifyOperands'])
-					# print(f"{self.NodeId} -> Modified message:", final_message)
-					# # # verify we have not already recieved this request
-					if self.log.HasDigestEntry(final_message):
-						print(f"{self.NodeId} -> I ALREADY HAVE THIS MESSAGE IN MY LOG BROTHA!")
-						return
-					# # # if not, add it to logs (note: This will only work for primary)
+
+					# # # add it to logs (note: This will only work for primary)
 					self.log.AddPrePrepare(final_message)
 
 					if final_message is not None:
 						# # # sign on message verified: Multicast the request all nodes in the network
-						print(f"{self.NodeId} -> I AM BROADCASTING!:", final_message)
 						communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, final_message, self.faults)
 					else:
 						# # # Client did not verify
@@ -325,9 +340,7 @@ class Node(object):
 				public_key_primary = self.ListOfNodes[str(self.view % self.total_allocated)]['public_key']
 
 				# # # Send all the details. It will verify and return the next packet to send
-				print(f"{self.NodeId} -> Before PREPREPARE")
 				result = handle_requests.Preprepare(message, self.client_public_key, public_key_primary, self.NodeId, self.private_key, self.view)
-				print(f"{self.NodeId} -> AFTER PREPREPARE", result)
 
 				# # # verification successful
 				if result is not None:
