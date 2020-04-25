@@ -190,9 +190,16 @@ class Node(object):
 
 
 	def ReplayPreviousMessage(self):
+		print("Hehehehe.. I am {}. Attempting Replay attackk.. hehehehehe".format(self.NodeId))
 		log = self.log.log
-		# if 
-
+		digest_list = list(log.keys())
+		# # #Can only do the attack is there is some message logged!
+		if len(digest_list) >= 1:
+			d = random.choice(digest_list)
+			message_token = log[d]['m']
+			message = {'token': message_token, 'type': 'Request'}
+			communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, message)
+			print(f"{self.NodeId} --> Send a replay attack with {message}!")
 
 
 	async def RunRoutine(self, websocket, path):
@@ -256,8 +263,10 @@ class Node(object):
 				print(self.faults)
 
 				# # # If replay attack is turned on, run a replay attack timer!
-				replay_timer = threading.Timer(5, self.ReplayPreviousMessage)
-				replay_timer.start()
+				if self.faults['ReplayAttack']:
+					self.ReplayPreviousMessage()
+				# replay_timer = threading.Timer(5, self.ReplayPreviousMessage)
+				# replay_timer.start()
 				
 
 			elif message['type'].upper() == 'DEBUG':
@@ -297,19 +306,15 @@ class Node(object):
 				self.SendStatusUpdate('request')
 				if handle_requests.digest(message) in self.log.log:
 					print(f"{self.NodeId} -> I ALREADY HAVE THIS MESSAGE IN MY LOG BROTHA!")
+					time.sleep(1)
+					self.SendStatusUpdate('Sleep')
 					return
-				time.sleep(1)
-				self.SendStatusUpdate('Sleep')
-				time.sleep(1)
 
 				if self.IsPrimary():
 					print(f"I am the primary with ID = {self.NodeId}. And I have just recieved a REQUEST from the client!")
 
 					# # # gen a new sequence number as (last+1)-----(default is 100)
 					seq_num = self.log.get_last_logged_seq_num() + 1
-
-					# # # Report UI that request has been received
-					self.SendStatusUpdate("request")
 
 					# # # Verify client's sign and returns the next message to send
 					final_message = handle_requests.Request(
@@ -328,7 +333,6 @@ class Node(object):
 				else:
 					# # # Node is not primary. Send the message to the actual 
 					print(f"Well I am NOT the primary with ID = {self.NodeId} in view {self.view}. I shall forward it to the required owner!")
-					self.SendStatusUpdate("request")
 					await communication.SendMsgRoutine(self.ListOfNodes[str(int(self.view) % self.total_allocated)]['Uri'], message)
 					self.timer = threading.Timer(TIMER_WAITING_TIME, self.InitiateViewChange, [message])
 					self.timer.start()
