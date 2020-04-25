@@ -240,7 +240,7 @@ class Node(object):
 				print(self.faults)
 
 			elif message['type'].upper() == 'DEBUG':
-				report.Report(self.client_uri, 'debug', {'id': self.NodeId, 'view':self.view})
+				report.Report(self.client_uri, 'debug', {'id': self.NodeId, 'view':self.view, 'LoN': list(self.ListOfNodes.keys())})
 
 
 			# # # We enter 'View-Change' mode when some error is detected. So no messages except VIEW-CHANGE are accepted

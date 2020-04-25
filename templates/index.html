@@ -1821,6 +1821,14 @@
         // console.log("Allocated " + msg.total);
         console.log("ID: " + msg['id'] + ", Current View: " + msg['view']);
         $('#status').text("ID: " + msg['id'] + ", Current View: " + msg['view']);
+
+        var LoN = "";
+        for(var i=0; i<msg['LoN'].length; i++){
+          LoN += msg['LoN'][i].toString() + ", ";
+          // console.log(LoN);
+        }
+        console.log("ID: " + msg['id'] + ", NodeId's connected: " + LoN);
+        $('#status').text("ID: " + msg['id'] + ", NodeId's connected: " + LoN);
       });
 
   });
