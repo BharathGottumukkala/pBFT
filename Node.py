@@ -126,7 +126,7 @@ class Node(object):
 				'InCorrectReply': False, 	#DONE
                 'ModifyOperands': False,	#DONE
                 'FakeViewChange': False,
-                'ReplayAttack': False,			
+                'ReplayAttack': False,		#DONE		
                 'Crash': False,				#DONE
                 'NetworkDelay': False,		#DONE
                 'TimeDelay': 0,				#DONE
@@ -265,6 +265,11 @@ class Node(object):
 				# # # If replay attack is turned on, run a replay attack timer!
 				if self.faults['ReplayAttack']:
 					self.ReplayPreviousMessage()
+				
+				if self.faults['FakeViewChange']:
+					self.InitiateViewChange()
+					mode_timer = threading.Timer(3, self.ChangeMode, ['Sleep'])
+					mode_timer.start()
 				# replay_timer = threading.Timer(5, self.ReplayPreviousMessage)
 				# replay_timer.start()
 				
