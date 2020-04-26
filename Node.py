@@ -246,20 +246,21 @@ class Node(object):
 			if message['type'].upper() == 'NEWNODE':
 				print(f"Id {message['id']} joined the network -> {self.NodeId}")
 				self.register(message)
-				if self.MissedNodeInfo():
-					await communication.SendMsgRoutine(self.NameSchedulerURI, {'type': "UpdateNodeInfo", 'id': self.NodeId})
+				# if self.MissedNodeInfo():
+				# 	await communication.SendMsgRoutine(self.NameSchedulerURI, {'type': "UpdateNodeInfo", 'id': self.NodeId})
 
 			elif message['type'].upper() == 'UPDATENODEINFO':
 				self.ListOfNodes = message['LoN']
+				self.ListOfNodes[self.NodeId]['allocate'] = True
 				print(f"{self.NodeId} -> Updated Node Info")
-				print(self.ListOfNodes)
+				# print(self.ListOfNodes)
 
 
 
 
 			# # # Allocate the node to the cluster
 			elif message['type'].upper() == 'ALLOCATE':
-				self.ListOfNodes[self.NodeId]['allocate'] = True
+				# self.ListOfNodes[self.NodeId]['allocate'] = True
 				await communication.SendMsgRoutine(self.NameSchedulerURI, {'type': "UpdateNodeInfo", 'id': self.NodeId})
 				# report.Report(self.client_uri, 'allocate', {'total': str(i+1)})
 				print(f"{self.NodeId} -> I got allocated")
