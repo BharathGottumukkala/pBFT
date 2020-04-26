@@ -260,6 +260,7 @@ class Node(object):
 			# # # Allocate the node to the cluster
 			elif message['type'].upper() == 'ALLOCATE':
 				self.ListOfNodes[self.NodeId]['allocate'] = True
+				await communication.SendMsgRoutine(self.NameSchedulerURI, {'type': "UpdateNodeInfo", 'id': self.NodeId})
 				# report.Report(self.client_uri, 'allocate', {'total': str(i+1)})
 				print(f"{self.NodeId} -> I got allocated")
 				self.log.flush()
@@ -478,7 +479,7 @@ class Node(object):
 
 						if (int(self.view_change_log.my_view_in_consideration) % self.total_allocated) == int(self.NodeId):
 							print(f"{self.NodeId} -> Okay, so I'll be the new primary for view {self.view_change_log.my_view_in_consideration}! I am telling everyone to finish changing view?")
-
+							time.sleep(2)
 							new_view_message = handle_requests.CreateNewViewMessage(self.view, self.view_change_log, self.private_key)
 							communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, new_view_message)
 							self.ChangeMode('Sleep')
