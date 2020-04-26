@@ -8,6 +8,7 @@ So in order to report we have to send a msg using socketio Client
 
 import socketio
 import time
+from config import config
 
 
 def Report(server, handle, message):
@@ -22,6 +23,7 @@ def Report(server, handle, message):
 	except Exception as e:
 		print(e)
 		time.sleep(0.5)
+		server = 'http://' + config().GetAddress('client') + ":4003/"
 		Report(server, handle, message)
 	
 

@@ -113,6 +113,11 @@ class NameScheduler(object):
 					# await self.BroadCastNewNode(message, msg)
 					# await BroadCast(message['IpAddr'], message['port'], self.ConnectedClients, msg)
 					Multicast('224.1.1.1', 8766, msg)
+
+			elif message['type'].upper() == 'UPDATENODEINFO':
+				print(f"Updating Node info of Node Id: {message['id']}")
+				msg = {'type': message['type'], 'LoN': self.ConnectedClients}
+				await SendMsgRoutine(self.ConnectedClients[message['id']]['Uri'], msg)
 					
 			if message['type'].upper() == 'UPDATEDETAILS':
 				if len(self.ConnectedClients):

@@ -118,6 +118,19 @@ class Node(object):
 		else:
 			return str(self.view % self.total_allocated) == str(self.NodeId)
 
+	def MissedNodeInfo(self):
+		max_id = max(list(self.ListOfNodes.keys()))
+		total_nodes = len(self.ListOfNodes)
+
+		if int(max_id) + 1 == total_nodes:
+			print(f"{self.NodeId} is Up-To-Date")
+			return False
+
+		else:
+			print(f"{self.NodeId} missed a few nodes. Collecting from NameScheduler")
+			# await communication.SendMsgRoutine(self.NameScheduler, {'type': "UpdateNodeInfo"})
+			return True
+
 	def SendStatusUpdate(self, new_mode):
 		report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': new_mode})
 
@@ -151,26 +164,33 @@ class Node(object):
 
 	async def HandshakeRoutine(self, uri):
 		# Get an ID from the NameScheduler for future communication
-		async with websockets.connect(uri) as websocket:
-			if self.NodeId is not None:
-				print(f"My Id is {self.NodeId}")
-			else:
-				message = {'type': 'handshake', 
-							'IpAddr': self.NodeIPAddr, 
-							'port': self.port,
-							'Uri': self.Uri,
-							'allocate': False
-							}
-				message = json.dumps(message)
+		try:
+			async with websockets.connect(uri) as websocket:
+				if self.NodeId is not None:
+					print(f"My Id is {self.NodeId}")
+				else:
+					message = {'type': 'handshake', 
+								'IpAddr': self.NodeIPAddr, 
+								'port': self.port,
+								'Uri': self.Uri,
+								'allocate': False
+								}
+					message = json.dumps(message)
 
-				await websocket.send(message)
-				recv = await websocket.recv()
-				recv = json.loads(recv)
-				self.NodeId =recv['id']
-				self.ListOfNodes = recv['LoN']
-				print(list(self.ListOfNodes.keys()))
-				self.public_key = self.ListOfNodes[self.NodeId]['public_key'].encode('utf-8')
-				self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
+					await websocket.send(message)
+					recv = await websocket.recv()
+					recv = json.loads(recv)
+					self.NodeId =recv['id']
+					self.ListOfNodes = recv['LoN']
+					print(list(self.ListOfNodes.keys()))
+					self.public_key = self.ListOfNodes[self.NodeId]['public_key'].encode('utf-8')
+					self.private_key = self.ListOfNodes[self.NodeId]['private_key'].encode('utf-8')
+		except Exception as e:
+			print(e)
+			print("Trying to reconnect in a few seconds")
+			time.sleep(2)
+			self.NameSchedulerURI = "ws://" + config().GetAddress('NameScheduler') + ":8765"
+			await self.HandshakeRoutine(self.NameSchedulerURI)
 
 	
 	def InitiateViewChange(self, message=None, view=None, tries=5):
@@ -226,6 +246,15 @@ class Node(object):
 			if message['type'].upper() == 'NEWNODE':
 				print(f"Id {message['id']} joined the network -> {self.NodeId}")
 				self.register(message)
+				if self.MissedNodeInfo():
+					await communication.SendMsgRoutine(self.NameSchedulerURI, {'type': "UpdateNodeInfo", 'id': self.NodeId})
+
+			elif message['type'].upper() == 'UPDATENODEINFO':
+				self.ListOfNodes = message['LoN']
+				print(f"{self.NodeId} -> Updated Node Info")
+				print(self.ListOfNodes)
+
+
 
 
 			# # # Allocate the node to the cluster
