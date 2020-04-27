@@ -77,7 +77,7 @@ def Cluster(size):
 
 if __name__ == '__main__':
 	# IsPortFree(7036)
-	Cluster(10)
+	Cluster(5)
 	# queue = Queue()
 	# processes = []
 	# try:

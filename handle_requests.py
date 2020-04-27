@@ -210,11 +210,17 @@ def CreateNewViewMessage(view, change_view_log, private_key):
 	return message
 
 
-def VerifyNewView(message, list_of_nodes, primary_id):
+def VerifyNewView(message, list_of_nodes):
+	'''
+	returns the verified view number (false otherwise!)
+	'''
 	jwt = messaging.jwt()
+	view = jwt.get_payload(message['token'])['v']
+	primary_id = view % len(list_of_nodes)
 	# # # check new primary sign is correct
 	primary_pubkey = list_of_nodes[str(primary_id)]['public_key']
 	if not jwt.verify(primary_pubkey, message['token']):
+		print(f"{primary_id} is not the primary for {view} in VerifyNewView function!")
 		return False
 	
 	# # # check rest of the signs
@@ -223,4 +229,4 @@ def VerifyNewView(message, list_of_nodes, primary_id):
 		if not jwt.verify(list_of_nodes[str(node_id)]['public_key'], payload[node_id]):
 			print(f"{node_id} didn't verify so everything is not ruined!")
 			return False
-	return True
+	return view

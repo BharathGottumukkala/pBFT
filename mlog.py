@@ -31,7 +31,9 @@ class MessageLog:
 		print(self.log)
 
 	def RequestLog(self, message):
-		return self.log[message['d']]
+		if message['d'] in self.log:
+			return self.log[message['d']]
+		return {'commit': []}
 
 	def AddPrePrepare(self, message):
 		if self.HasDigestEntry(message):
@@ -99,6 +101,7 @@ class ViewChangeLog:
 	def __init__(self):
 		self.log = {}
 		self.my_view_in_consideration = 0
+		self.last_verified_view = 0
 		'''
 		format:
 		self.log = {
@@ -116,8 +119,8 @@ class ViewChangeLog:
 		jwt = messaging.jwt()
 		view_change = jwt.get_payload(message['token'])
 		self.log[view_change['i']] = message['token']
-		if str(view_change['i']) == str(my_id):
-			self.my_view_in_consideration = view_change['v']
+		# if str(view_change['i']) == str(my_id):
+		# 	self.my_view_in_consideration = view_change['v']
 
 	def flush(self):
 		self.log = {}
