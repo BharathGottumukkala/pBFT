@@ -213,8 +213,8 @@ class Node(object):
 													self.private_key)
 		self.view_change_log.my_view_in_consideration = view
 		# print(view_change_message)
-		communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, view_change_message)
 		self.ChangeMode('View-Change')
+		communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, view_change_message)
 
 		print(f"{self.NodeId} -> Starting recursive timer for view {view}.")
 		self.timer = threading.Timer(
