@@ -271,6 +271,7 @@ class Node(object):
 				self.view = 0
 				self.total_allocated = message['total']
 				self.ResetFaults()
+				self.mode = 'Sleep'
 				self.SendStatusUpdate('allocated')
 				# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'allocated'})
 

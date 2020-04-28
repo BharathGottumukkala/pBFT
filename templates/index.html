@@ -1819,7 +1819,8 @@
         }
 
         else if(msg['status'] == 'view-change'){
-          $('#' + msg['id'].toString() + '_progress').css('width' , '0%'); 
+          $('#' + msg['id'].toString() + '_progress').css('width' , '0%');
+          msg['status'] += " -> " + (parseInt(msg['view']) + 1).toString()
 
         }
 
@@ -1849,14 +1850,20 @@
       socket.on('reply_count', function(msg) {
         // console.log("Allocated " + msg.total);
         console.log("Inside reply_count");
+
+        $('#reply_count').text("");
+        
         var vals = "";
         for (const [key, value] of Object.entries(msg['reply_count'])) {
           console.log(key, value);
           // vals += key.toString() + ": " + value.toString() + ""
           vals += value.toString() + " reply(s) for Result " + key.toString()
+          // $('#reply_count').text();
+          $('#reply_count').append("Result: " + key.toString() + "&nbsp;&nbsp;Replies: " + value.toString() + "<br>");
+
         }
 
-        $('#reply_count').text("Result: " + vals);
+        
       });
 
       socket.on('debug', function(msg) {
