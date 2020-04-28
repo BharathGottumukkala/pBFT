@@ -14,8 +14,6 @@ def digest(message:dict, hash="SHA256"):
 
 
 def Request(message, public_key, view, n, private_key, faulty=False):
-	import pickle
-	pickle.dump(message, open("message.pickle", 'wb'))
 	verifier = messaging.jwt(jwt=message['token'])
 	# # # Verify the signatue on the token
 	verify = verifier.verify(public_key, message['token'])
@@ -210,13 +208,13 @@ def CreateNewViewMessage(view, change_view_log, private_key):
 	return message
 
 
-def VerifyNewView(message, list_of_nodes):
+def VerifyNewView(message, list_of_nodes, total_allocated):
 	'''
 	returns the verified view number (false otherwise!)
 	'''
 	jwt = messaging.jwt()
 	view = jwt.get_payload(message['token'])['v']
-	primary_id = view % len(list_of_nodes)
+	primary_id = view % total_allocated
 	# # # check new primary sign is correct
 	primary_pubkey = list_of_nodes[str(primary_id)]['public_key']
 	if not jwt.verify(primary_pubkey, message['token']):

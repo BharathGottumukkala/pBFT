@@ -313,8 +313,8 @@ class Node(object):
 				# # # Fake view change attack
 				if self.faults['FakeViewChange']:
 					self.InitiateViewChange()
-					mode_timer = threading.Timer(3, self.ChangeMode, ['Sleep'])
-					mode_timer.start()
+					# mode_timer = threading.Timer(3, self.ChangeMode, ['Sleep'])
+					# mode_timer.start()
 				
 
 			elif message['type'].upper() == 'DEBUG':
@@ -476,7 +476,7 @@ class Node(object):
 					if self.view_change_log.my_view_in_consideration == self.view_change_log.last_verified_view and self.mode == 'View-Change':
 						self.view = self.view_change_log.my_view_in_consideration
 						print(
-							f"{self.NodeId} -> After changing views to {self.view}, I'm going to sleep....")
+							f"{self.NodeId} -> After changing views to {self.view} (in VIEW-CHANGE), I'm going to sleep....")
 						# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'view_change'})
 						self.ChangeMode('Sleep')
 						self.view_change_log.flush()
@@ -496,14 +496,14 @@ class Node(object):
 
 			elif message['type'].upper() == 'NEW-VIEW':
 				print(f"{self.NodeId} -> Recieved a NEW-VIEW. I'm considering {self.view_change_log.my_view_in_consideration}. Just notifying ya!")
-				view_verified = handle_requests.VerifyNewView(message, self.ListOfNodes)
+				view_verified = handle_requests.VerifyNewView(message, self.ListOfNodes, self.total_allocated)
 				if view_verified:
 					self.view_change_log.last_verified_view = view_verified
 				else:
 					print(f"{self.NodeId} -> NEW-VIEW message verification failed!")
 				if self.view_change_log.my_view_in_consideration == self.view_change_log.last_verified_view and self.mode == 'View-Change':
 					self.view = self.view_change_log.my_view_in_consideration
-					print(f"{self.NodeId} -> After changing views to {self.view}, I'm going to sleep....")
+					print(f"{self.NodeId} -> After changing views to {self.view} (in NEW-VIEW), I'm going to sleep....")
 					# report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': 'view_change'})
 					self.ChangeMode('Sleep')
 					self.view_change_log.flush()
