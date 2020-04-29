@@ -361,12 +361,12 @@ class Node(object):
 			# # # Request recieved from client
 			elif message['type'].upper() == 'REQUEST' and self.mode == 'Sleep':
 				# # # verify we have not already recieved this request
-				self.SendStatusUpdate('request')
 				if handle_requests.digest(message) in self.log.log:
 					print(f"{self.NodeId} -> I ALREADY HAVE THIS MESSAGE IN MY LOG BROTHA!")
 					# time.sleep(1)
-					self.SendStatusUpdate('sleep')
+					# self.SendStatusUpdate('sleep')
 					return
+				self.SendStatusUpdate('request')
 
 				if self.IsPrimary():
 					print(f"I am the primary with ID = {self.NodeId}. And I have just recieved a REQUEST from the client!")
