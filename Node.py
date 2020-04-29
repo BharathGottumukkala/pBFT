@@ -131,8 +131,11 @@ class Node(object):
 			# await communication.SendMsgRoutine(self.NameScheduler, {'type': "UpdateNodeInfo"})
 			return True
 
-	def SendStatusUpdate(self, new_mode):
-		report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': new_mode})
+	def SendStatusUpdate(self, new_mode, view=None):
+		if view is not None:
+			report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':view, 'status': new_mode})
+		else:
+			report.Report(self.client_uri, 'status', {'id': self.NodeId, 'view':self.view , 'status': new_mode})
 
 	def ResetFaults(self):
 		self.faults = {
@@ -146,13 +149,17 @@ class Node(object):
                 'Benign': True,				#DONE		
 				}
 
-	def ChangeMode(self, mode):
+	def ChangeMode(self, mode, view=None):
 		possible_modes = ['Sleep', 'Prepare', 'Commit', 'Checkpoint', 'View-Change']
 		if mode not in possible_modes:
 			raise f"{mode} is not a valid mode. Please select from {possible_modes}"
 		print(f"{self.NodeId} changing mode from {self.mode} to {mode}")
 		self.mode = mode
-		self.SendStatusUpdate(self.mode.lower())
+		if view is not None:
+			self.SendStatusUpdate(self.mode.lower(), view)
+		else:
+			self.SendStatusUpdate(self.mode.lower())
+
 		# time.sleep(0.5)
 
 
@@ -213,7 +220,7 @@ class Node(object):
 													self.private_key)
 		self.view_change_log.my_view_in_consideration = view
 		# print(view_change_message)
-		self.ChangeMode('View-Change')
+		self.ChangeMode('View-Change', view-1)
 		communication.Multicast(MULTICAST_SERVER_IP, MULTICAST_SERVER_PORT, view_change_message)
 
 		print(f"{self.NodeId} -> Starting recursive timer for view {view}.")
