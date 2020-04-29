@@ -326,9 +326,6 @@ class Node(object):
 			elif message['type'].upper() not in ['VIEW-CHANGE', 'NEW-VIEW'] and self.mode == 'View-Change':
 				return #dont do anything, there is something wrong with the distributed system!
 
-			elif message['type'].upper() == 'FORCE-VIEW-CHANGE':
-				self.InitiateViewChange()
-
 
 			# # # Get and register client's info
 			elif message['type'].upper() == 'CLIENT':
@@ -344,9 +341,14 @@ class Node(object):
 					report.Report(self.client_uri, 'status', {'test': 'All the best'})
 
 
-			# # # REBOOT NODE doesnt reply
+			# # # CRASH NODE doesnt reply
 			elif int(self.faults['Crash']):
 				return
+
+
+			# # # Forcing view change
+			elif message['type'].upper() == 'FORCE-VIEW-CHANGE':
+				self.InitiateViewChange()
 
 
 			# # # Request recieved from client
