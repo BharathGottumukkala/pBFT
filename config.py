@@ -29,11 +29,13 @@ class config(object):
 			with open(self.file, "r") as con:
 				pass
 		except Exception as e:
+			print(f"{e}-> Error in the forst exception")
 			try:
 				self.file = "/app/config.json"
 				with open(self.file, "r") as con:
 					pass
 			except Exception as er:
+				print(er)
 				self.file = "config.json"
 
 		# self.file = "/users/ConMan/pBFT/config.json"
