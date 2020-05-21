@@ -11,7 +11,6 @@ greenlet==0.4.15
 idna==2.9
 itsdangerous==1.1.0
 Jinja2==2.11.1
-language-selector==0.1
 MarkupSafe==1.1.1
 monotonic==1.5
 pycparser==2.20
