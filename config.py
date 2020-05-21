@@ -29,7 +29,12 @@ class config(object):
 			with open(self.file, "r") as con:
 				pass
 		except Exception as e:
-			self.file = "config.json"
+			try:
+				self.file = "/app/config.json"
+				with open(self.file, "r") as con:
+					pass
+			except Exception as er:
+				self.file = "config.json"
 
 		# self.file = "/users/ConMan/pBFT/config.json"
 		exception = False

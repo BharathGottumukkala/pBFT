@@ -25,4 +25,3 @@ six==1.14.0
 urllib3==1.25.8
 websockets==8.1
 Werkzeug==1.0.0
-z3-solver==4.8.7.0
