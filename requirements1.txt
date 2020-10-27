@@ -3,7 +3,7 @@ cffi==1.14.0
 chardet==3.0.4
 Click==7.0
 command-not-found==0.3
-cryptography==2.8
+cryptography==3.2
 distro-info===0.18ubuntu0.18.04.1
 dnspython==1.16.0
 eventlet==0.25.1
