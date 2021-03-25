@@ -22,7 +22,7 @@ pygobject==3.26.1
 python-apt==1.6.5+ubuntu0.2
 python-engineio==3.11.2
 python-socketio==4.4.0
-PyYAML==3.12
+PyYAML==5.4
 requests==2.18.4
 six==1.14.0
 ssh-import-id==5.7
