@@ -6,7 +6,7 @@ command-not-found==0.3
 cryptography==2.8
 distro-info===0.18ubuntu0.18.04.1
 dnspython==1.16.0
-eventlet==0.25.1
+eventlet==0.31.0
 Flask==1.1.1
 Flask-SocketIO==4.2.1
 greenlet==0.4.15
